@@ -155,9 +155,7 @@ setvect13:
 		move.l	(-16,a2),(a3)+
 		pea	(-28,a2)	*CONDRV.SYSのオプションの格納アドレス
 		move.l	(sp)+,(a3)+	*CONDFLAG
-		.if	1
 		move.l	(-22,a2),(a3)	*CONDSYSCALL
-		.endif
 
 		lea	(CONDRVPATCH,pc),a2
 		lea	(putc,pc),a3	*CONDRV.SYS用のパッチ当てを行なう
@@ -1626,16 +1624,6 @@ rte_patch_skip:
 		rts
 .endif
 
-.if 0
-check_mpu_type:
-		move.l	a1,-(sp)
-		lea	(MPUTYPE),a1
-		IOCS	_B_BPEEK
-		subq.b	#1,d0
-		movea.l	(sp)+,a1
-		rts
-.endif
-
 
 *	ＩＯＣＳ　ＲＯＭのパッチ当てを行なう
 
@@ -1730,11 +1718,7 @@ mask_spurious:
 		movea.l	(SPURIVEC),a0
 		cmp	(a0),d0
 		beq	mask_spurious_end	;既に rte になっていたらそのまま
-.if 1
 		lea	($ff0000),a0
-.else
-		lea	($fc0000),a0
-.endif
 @@:		cmp	(a0)+,d0		;ROM から rte を探す
 		bne	@b
 		subq.l	#2,a0

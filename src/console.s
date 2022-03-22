@@ -3237,21 +3237,6 @@ putc_escsq0::	bra	putc_escsq8		;condrv 常駐時は hiocs.s から
 		bhi	putc_escsq02		;2->1 3->2
 		beq	putc_escsq01
 
-		.if	0
-* 従来の、バッファ書き込みルーチンの先頭の命令を
-* 書き換える(movem/rts)方法.
-		move	#RTS,d0			;ESC 0	バックログ記録禁止
-		bra	@f
-putc_escsq01:
-		move	#MOVEM,d0		;ESC 1	バックログ記録許可
-@@:
-		cmp	(a2),d0
-		beq	putc_escsq8		;書き換え不要
-
-		move	d0,(a2)
-		bsr	clear_mpu_cache
-		bra	putc_escsq04
-		.else
 * condrv のシステムコール $24 を使用する方法.
 * 従来と互換性がないが、ネストが可能(ESC 0 の状態
 * で ESC 0 ESC 1 を処理すると ESC 0 の状態に戻る).
@@ -3269,7 +3254,7 @@ putc_escsq01:
 		jsr	(a2)			;システムコールを呼び出す
 		move.l	(sp)+,d1
 		bra	putc_escsq8
-		.endif
+
 putc_escsq02:
 		subq.b	#2,d0
 		beq	putc_escsq03

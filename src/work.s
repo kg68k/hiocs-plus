@@ -53,9 +53,7 @@ FONTKNJ16C::	.dc.l	fon_knj16+$1d600 *16×16 全角(ＪＩＳ第２水準漢字)
 
 LOGBUFVECT::	.ds.l	1	*CONDRV.SYSのバックログ処理アドレス
 CONDFLAG::	.ds.l	1	*CONDRV.SYSのオプションフラグのアドレス
-		.if	1
 CONDSYSCALL::	.ds.l	1	*CONDRV.SYSのシステムコールのアドレス
-		.endif
 
 		.end
 
