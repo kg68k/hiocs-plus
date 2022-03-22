@@ -26,14 +26,11 @@
 		.xref	LOGBUFVECT
 		.xref	STDOUTPTR
 * ROMPATCH
-		.xref	patchbegin,patchend,gpalet,dmamove,ms_patst,ontime
-.ifdef HONTIME
-		.xref	hontime_table
-.endif
+		.xref	patchbegin,patchend,gpalet,dmamove,ms_patst
 * CONDRV
 		.xref	putc,putc_log,putc_escsq0
 * rte修正
-		.xref	os_curon_rte,mscdraw_rte,mscerase_rte,txyline_rte,txline_rte,ontime_rte
+		.xref	os_curon_rte,mscdraw_rte,mscerase_rte,txyline_rte,txline_rte
 * MOUSE
 		.xref	mscdrawA,msceraseA,msctrlsetA,msctrlsetB,msdpatch1,msdpatch2,msepatch1,msepatch2
 
@@ -596,10 +593,8 @@ OLDSCCBVC2:	.ds.l	1
 
 *	IOCSパッチテーブル
 
-patchtbl:	.dc.l	0	*_GPALET
-		.dc.l	0	*_DMAMOVE
-		.dc.l	0	*_MS_PATST
-		.dc.l	0	*_ONTIME
+PATCHTBL_SIZE:	.equ	3	*_GPALET,_DMAMOVE,_MS_PATST
+patchtbl:	.ds.l	PATCHTBL_SIZE
 
 *	IOCSベクタテーブル
 
@@ -1005,10 +1000,9 @@ dev_init1:
 .endif
 		bsr	rompatch	*IOCS ROM へのパッチ当て
 		lea	(patchtbl,pc),a0	*<+03
+	.rept	PATCHTBL_SIZE
 		clr.l	(a0)+		*(デバイスドライバ組み込みの場合は
-		clr.l	(a0)+		*	パッチ解除は無効)
-		clr.l	(a0)+
-		clr.l	(a0)
+	.endm				*	パッチ解除は無効)
 
 		bsr	copyank8	*ＲＯＭフォントをＲＡＭに転送
 
@@ -1441,17 +1435,10 @@ cmd_rels2:
 	bne	vecterr
 cmd_rels3:
 	tst.l	(a1)+
-	beq	cmd_rels_p1
+	beq	cmd_rels4
 
 	lea	(ms_patst-dev_header+$f0,a0),a2
 	cmpa.l	(_MS_PATST*4+$400),a2
-	bne	vecterr
-cmd_rels_p1:
-	tst.l	(a1)+
-	beq	cmd_rels4
-
-	lea	(ontime-dev_header+$f0,a0),a2
-	cmpa.l	(_ONTIME*4+$400),a2
 	bne	vecterr
 cmd_rels4:
 		bsr	ioctrl_write	*HIOCSパラメータを設定する
@@ -1480,11 +1467,6 @@ cmd_rels6:
 
 	move.l	d1,(_MS_PATST*4+$400)
 cmd_rels7:
-	move.l	(a1)+,d1
-	beq	cmd_rels8
-
-	move.l	d1,(_ONTIME*4+$400)
-cmd_rels8:
 	movea.l	(LINKPTR-dev_header+$f0,a0),a1	*前のリンクポインタ
 	move.l	($f0,a0),(a1)		*'@IOCS'をデバイスドライバリンクから外す
 	move.l	d0,-(sp)
@@ -1649,7 +1631,6 @@ rte_patch:
 		move	d0,(mscerase_rte-os_curon_rte,a0)
 		move	d0, (txyline_rte-os_curon_rte,a0)
 		move	d0,  (txline_rte-os_curon_rte,a0)
-		move	d0,  (ontime_rte-os_curon_rte,a0)
 * キャッシュフラッシュは不要.
 rte_patch_skip:
 		rts
@@ -1723,21 +1704,6 @@ rompatch4:
 	lea	(ms_patst-patchbegin,a1),a2
 	move.l	a2,(_MS_PATST*4+$400)
 rompatch5:
-	addq.l	#4,a0
-.ifdef HONTIME
-	lea	(hontime_table+60*24*4-patchbegin,a1),a2
-	move.l	#60*100,d0		1分=60.00秒
-	move.l	#60*100*60*24,d1
-@@:
-	move.l	d1,-(a2)
-	sub.l	d0,d1
-	bne	@b
-.endif
-	move.l	(_ONTIME*4+$400),(a0)
-	lea	(ontime-patchbegin,a1),a2
-	move.l	a2,(_ONTIME*4+$400)
-	IOCS	_ONTIME
-
 	moveq	#0,d0			*アドレス変更を行なった
 	rts
 
@@ -2154,7 +2120,7 @@ title_msg_2:	.dc.b	program
 .if CPU==68030
 		.dc.b	' for X68030'
 .endif
-		.dc.b	' version ',version,' (C)1990-95 SHARP / Y.Nakamura, ',date,' ',author,'.'
+		.dc.b	' version ',version,' (C)1990-95 SHARP / Y.Nakamura, ',date,' TcbnErik.'
 crlf_msg:	.dc.b	CR,LF,0
 
 paramerr_msg:	.dc.b	'オプション指定に間違いがあります.',CR,LF,0
