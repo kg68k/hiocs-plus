@@ -20,7 +20,7 @@ hiocs030.x: $(OBJS:.o=030.o)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 %.o: %.s hiocs.equ
-	$(AS) $(ASFLAGS) -o $@ $< -sCPU=68000 -sHONTIME
+	$(AS) $(ASFLAGS) -o $@ $< -sCPU=68000
 
 %030.o: %.s hiocs.equ
 	$(AS) $(ASFLAGS) -o $@ $< -sCPU=68030
