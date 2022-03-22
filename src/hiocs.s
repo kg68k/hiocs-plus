@@ -104,9 +104,9 @@ iocscall:
 *************************************************
 
 setvect:
-	tst.b	(a1)			*trap #15ベクタ
+	tst.b	(~IOCSCALLFLG,a1)	*trap #15ベクタ
 	bne	setvect1		*すでに変更されている
-	tst.b	(a0)
+	tst.b	(~IOCSCALLFLG,a0)
 	beq	setvect1		*変更しない
 
 	lea	(OLDTRAPVC,pc),a2
@@ -116,12 +116,12 @@ setvect:
 	bcs	setvect1		*trap #15処理は変更されている
 	lea	(iocscall,pc),a2
 	move.l	a2,(TRAPFVEC)
-	st	(a1)
+	st	(~IOCSCALLFLG,a1)
 setvect1:
-		tst.b	(1,a1)		*IOCS文字出力ベクタ
-		bne	setvect2	*すでに変更されている
-		move.b	(1,a0),(1,a1)
-		beq	setvect2	*変更しない
+	tst.b	(~IOCSCONFLG,a1)	*IOCS文字出力ベクタ
+	bne	setvect2		*すでに変更されている
+	move.b	(~IOCSCONFLG,a0),(~IOCSCONFLG,a1)
+	beq	setvect2		*変更しない
 
 		IOCS	_B_CUROFF	*<+08
 		lea	(CSRDRLINE),a2
@@ -173,17 +173,17 @@ setvect13:
 
 		bsr	clear_mpu_cache
 setvect2:
-	tst.b	(2,a1)			*IOCSグラフィック描画ベクタ
+	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	bne	setvect3		*すでに変更されている
-	move.b	(2,a0),(2,a1)
+	move.b	(~IOCSGRFLG,a0),(~IOCSGRFLG,a1)
 	beq	setvect3		*変更しない
 
 	lea	(iocsgtbl,pc),a3
 	bsr	chgvecttbl_iocs		*IOCSベクタを変更する
 setvect3:
-	tst.b	(3,a1)			*DOS文字出力ベクタ
+	tst.b	(~DOSCONFLG,a1)		*DOS文字出力ベクタ
 	bne	setvect4		*すでに変更されている
-	move.b	(3,a0),(3,a1)
+	move.b	(~DOSCONFLG,a0),(~DOSCONFLG,a1)
 	beq	setvect4		*変更しない
 
 	bsr	seahumanptr		*stdoutファイルハンドルポインタを検索する
@@ -194,9 +194,9 @@ setvect3:
 	bsr	chgvecttbl		*DOSベクタを変更する
 
 setvect4:
-	tst.b	(4,a1)			*IOCSマウス処理ベクタ
+	tst.b	(~IOCSMSFLG,a1)		*IOCSマウス処理ベクタ
 	bne	setvect10		*すでに変更されている
-	move.b	(4,a0),(4,a1)
+	move.b	(~IOCSMSFLG,a0),(~IOCSMSFLG,a1)
 	beq	setvect10		*変更しない
 
 	lea	(iocsmtbl,pc),a3
@@ -281,9 +281,9 @@ seahumanptr:				*<+03
 *	復帰するベクタが変更されていないかどうかチェック
 
 restorevect:
-	tst.b	(a1)			*trap #15ベクタ
+	tst.b	(~IOCSCALLFLG,a1)	*trap #15ベクタ
 	beq	restorevect1		*変更されていない
-	tst.b	(a0)
+	tst.b	(~IOCSCALLFLG,a0)
 	bne	restorevect1		*元の値に戻さない
 
 	lea	(iocscall,pc),a2
@@ -291,9 +291,9 @@ restorevect:
 	bne	restorevect99
 
 restorevect1:
-	tst.b	(1,a1)			*IOCS文字出力ベクタ
+	tst.b	(~IOCSCONFLG,a1)	*IOCS文字出力ベクタ
 	beq	restorevect2		*変更されていない
-	tst.b	(1,a0)
+	tst.b	(~IOCSCONFLG,a0)
 	bne	restorevect2		*元の値に戻さない
 
 	lea	(iocsctbl,pc),a3
@@ -316,9 +316,9 @@ restorevect15:
 		bsr	check_condrv_mark
 		bne	restorevect99
 restorevect2:
-	tst.b	(2,a1)			*IOCSグラフィック描画ベクタ
+	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	beq	restorevect3		*変更されていない
-	tst.b	(2,a0)
+	tst.b	(~IOCSGRFLG,a0)
 	bne	restorevect3		*元の値に戻さない
 
 	lea	(iocsgtbl,pc),a3
@@ -326,9 +326,9 @@ restorevect2:
 	bne	restorevect99
 
 restorevect3:
-	tst.b	(3,a1)			*DOS文字出力ベクタ
+	tst.b	(~DOSCONFLG,a1)		*DOS文字出力ベクタ
 	beq	restorevect4		*変更されていない
-	tst.b	(3,a0)
+	tst.b	(~DOSCONFLG,a0)
 	bne	restorevect4		*元の値に戻さない
 
 	lea	($1800),a2
@@ -337,9 +337,9 @@ restorevect3:
 	bne	restorevect99
 
 restorevect4:
-	tst.b	(4,a1)			*IOCSマウス処理ベクタ
+	tst.b	(~IOCSMSFLG,a1)		*IOCSマウス処理ベクタ
 	beq	restorevect50		*変更されていない
-	tst.b	(4,a0)
+	tst.b	(~IOCSMSFLG,a0)
 	bne	restorevect50		*元の値に戻さない
 
 	lea	(iocsmtbl,pc),a3
@@ -367,17 +367,17 @@ restorevect5:
 *	ベクタを元の値に戻す
 
 restorevect50:
-	tst.b	(a1)			*trap #15ベクタ
+	tst.b	(~IOCSCALLFLG,a1)	*trap #15ベクタ
 	beq	restorevect51		*変更されていない
-	move.b	(a0),(a1)
+	move.b	(~IOCSCALLFLG,a0),(~IOCSCALLFLG,a1)
 	bne	restorevect51		*元の値に戻さない
 
 	move.l	(OLDTRAPVC,pc),(TRAPFVEC)
 
 restorevect51:
-	tst.b	(1,a1)			*IOCS文字出力ベクタ
+	tst.b	(~IOCSCONFLG,a1)	*IOCS文字出力ベクタ
 	beq	restorevect52		*変更されていない
-	move.b	(1,a0),(1,a1)
+	move.b	(~IOCSCONFLG,a0),(~IOCSCONFLG,a1)
 	bne	restorevect52		*元の値に戻さない
 
 	IOCS	_B_CUROFF		*<+03
@@ -402,18 +402,18 @@ restorevect513:
 
 		bsr	clear_mpu_cache
 restorevect52:
-	tst.b	(2,a1)			*IOCSグラフィック描画ベクタ
+	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	beq	restorevect53		*変更されていない
-	move.b	(2,a0),(2,a1)
+	move.b	(~IOCSGRFLG,a0),(~IOCSGRFLG,a1)
 	bne	restorevect53		*元の値に戻さない
 
 	lea	(iocsgtbl,pc),a3
 	bsr	rstvecttbl_iocs
 
 restorevect53:
-	tst.b	(3,a1)			*DOS文字出力ベクタ
+	tst.b	(~DOSCONFLG,a1)		*DOS文字出力ベクタ
 	beq	restorevect54		*変更されていない
-	move.b	(3,a0),(3,a1)
+	move.b	(~DOSCONFLG,a0),(~DOSCONFLG,a1)
 	bne	restorevect54		*元の値に戻さない
 
 	lea	($1800),a2
@@ -421,9 +421,9 @@ restorevect53:
 	bsr	rstvecttbl
 
 restorevect54:
-	tst.b	(4,a1)			*IOCSマウス処理ベクタ
+	tst.b	(~IOCSMSFLG,a1)		*IOCSマウス処理ベクタ
 	beq	restorevect60		*変更されていない
-	move.b	(4,a0),(4,a1)
+	move.b	(~IOCSMSFLG,a0),(~IOCSMSFLG,a1)
 	bne	restorevect60		*元の値に戻さない
 
 	lea	(iocsmtbl,pc),a3
@@ -542,17 +542,22 @@ setundefchr6:
 
 
 *	IOCTRL用データ
+
+		.offset	0
+~IOCSCALLFLG:	.ds.b	1	*trap #15処理ルーチン変更フラグ	(※順序を変更しないこと)
+~IOCSCONFLG:	.ds.b	1	*IOCS文字出力ベクタ変更フラグ
+~IOCSGRFLG:	.ds.b	1	*IOCSグラフィック描画ベクタ変更フラグ
+~DOSCONFLG:	.ds.b	1	*DOS文字出力ベクタ変更フラグ
+~IOCSMSFLG:	.ds.b	1	*IOCSマウス処理ベクタ変更フラグ
+VECTFLGSIZE:
+		.text
+
 		.even
 IOCTRLDATA:	.dc.b	HIOCS_ID,version	*(16bytes)
 IOCTRLERR:	.ds	1			*(IOCTRL時のエラーコード)
 TOPADR:		.dc.l	0	*常駐部先頭アドレス(デバイスドライバ登録なら0)
 
-IOCSCALLFLG:	.dc.b	0	*trap #15処理ルーチン変更フラグ	(※順序を変更しないこと)
-IOCSCONFLG:	.dc.b	0	*IOCS文字出力ベクタ変更フラグ
-IOCSGRFLG:	.dc.b	0	*IOCSグラフィック描画ベクタ変更フラグ
-DOSCONFLG:	.dc.b	0	*DOS文字出力ベクタ変更フラグ
-IOCSMSFLG:	.dc.b	0	*IOCSマウス処理ベクタ変更フラグ
-VECTFLGSIZE:	.equ	*-IOCSCALLFLG
+IOVECTFLG:	.ds.b	VECTFLGSIZE
 		.even
 
 EXFONTBUF:	.dc.l	0	*拡張フォントバッファ先頭アドレス(なければ0)
@@ -714,18 +719,15 @@ dev_strtgy::
 *	@IOCS	割り込みルーチン	*
 *****************************************
 
+*	X68000でhiocs030.xを組み込もうとした場合を考慮すると
+*	ここでは68020命令を使ってはいけない。
+
 		.cpu	68000
 dev_intrpt::
 		movem.l	d0-d7/a0-a6,-(sp)
 		movea.l	(dev_rqhptr,pc),a5
 		moveq	#0,d0
 		move.b	(2,a5),d0	*コマンドコード
-.if 0	/* .if CPU>=68020 */
-		move	(dev_jmptbl,pc,d0.w*2),d0
-		jsr	(dev_jmptbl,pc,d0.w)
-		ror	#8,d0
-		move	d0,(3,a5)
-.else
 		add	d0,d0
 		move	(dev_jmptbl,pc,d0.w),d0
 		jsr	(dev_jmptbl,pc,d0.w)
@@ -733,7 +735,6 @@ dev_intrpt::
 		move.b	d0,(a5)+	*エラーコード	 (L)
 		move	d0,-(sp)	;lsr	#8,d0
 		move.b	(sp)+,(a5)	;move.b	d0,(a5)	*(H)
-.endif
 		movem.l	(sp)+,d0-d7/a0-a6
 		rts
 		.cpu	CPU
@@ -804,8 +805,8 @@ dev_iocout1:
 		dbne	d0,dev_iocout1
 		bne	dev_err
 
-		lea	(IOCSCALLFLG-IOCTRLDATA,a6),a0
-		lea	(IOCSCALLFLG,pc),a1
+		lea	(IOVECTFLG-IOCTRLDATA,a6),a0
+		lea	(IOVECTFLG,pc),a1
 		bsr	restorevect	*IOCS/DOSベクタを元に戻す
 		bne	dev_iocout9	*ベクタが変更されている
 		bsr	setvect		*IOCS/DOSベクタを変更する
@@ -981,7 +982,7 @@ dev_init:
 		lea	(dev_jmptbl,pc),a0
 		move	#dev_err-dev_jmptbl,(0,a0)
 
-		lea	(IOCSCALLFLG,pc),a0
+		lea	(IOVECTFLG,pc),a0
 		moveq	#VECTFLGSIZE-1,d0
 dev_init1:
 		st	(a0)+		*全ベクタを変更する(デフォルト)
@@ -1007,7 +1008,7 @@ dev_init1:
 		bsr	copyank8	*ＲＯＭフォントをＲＡＭに転送
 
 		lea	(VECTFLG,pc),a0
-		lea	(IOCSCALLFLG,pc),a1
+		lea	(IOVECTFLG,pc),a1
 		moveq	#VECTFLGSIZE-1,d0
 dev_init2:
 		move.b	(a1),(a0)+
@@ -1017,7 +1018,7 @@ dev_init2:
 		bsr	csrpat_init
 
 		lea	(VECTFLG,pc),a0
-		lea	(IOCSCALLFLG,pc),a1
+		lea	(IOVECTFLG,pc),a1
 		bsr	setvect		*ベクタを変更する
 
 		bsr	readfont_dev	*フォントファイルを読み込む
@@ -1274,11 +1275,11 @@ cmd_exec2:
 		dbne	d0,cmd_exec2
 		bne	vererr
 
-		move.b	(IOCSGRFLG,pc),d0
+		move.b	(IOVECTFLG+~IOCSGRFLG,pc),d0
 		bne	cmd_exec4
 
 *(デバイスドライバ解除状態から復帰する場合)
-		lea	(IOCSCALLFLG,pc),a0
+		lea	(IOVECTFLG,pc),a0
 		moveq	#VECTFLGSIZE-1,d0
 cmd_exec3:
 		st	(a0)+
@@ -1410,7 +1411,7 @@ ex_fontset9:
 *	-rスイッチ(常駐解除)
 
 cmd_rels:
-	lea	(IOCSCALLFLG,pc),a0
+	lea	(IOVECTFLG,pc),a0
 	moveq	#VECTFLGSIZE-1,d0
 cmd_rels1:
 	sf	(a0)+			*全ベクタを復帰する
@@ -1481,7 +1482,7 @@ cmd_rels7:
 *	HIOCS.Xが組み込まれていない場合
 
 cmd_exec50:
-		lea	(IOCSCALLFLG,pc),a0
+		lea	(IOVECTFLG,pc),a0
 		moveq	#VECTFLGSIZE-1,d0
 cmd_exec51:
 		st	(a0)+		*全ベクタを変更する(デフォルト)
@@ -1516,7 +1517,7 @@ cmd_exec51:
 
 	bsr	rompatch		*IOCS ROM へのパッチ当て
 	lea	(VECTFLG,pc),a0
-	lea	(IOCSCALLFLG,pc),a1
+	lea	(IOVECTFLG,pc),a1
 	moveq	#VECTFLGSIZE-1,d0
 cmd_exec52:
 	move.b	(a1),(a0)+
@@ -1526,7 +1527,7 @@ cmd_exec52:
 		bsr	csrpat_init
 
 		lea	(VECTFLG,pc),a0
-		lea	(IOCSCALLFLG,pc),a1
+		lea	(IOVECTFLG,pc),a1
 		bsr	setvect		*ベクタを変更する
 		bsr	setundefchr	*未定義漢字コードを設定する
 
@@ -1823,7 +1824,7 @@ param9:
 		rts			;d0.l=0
 
 param_d:				*-d[0/1]
-		lea	(DOSCONFLG,pc),a0
+		lea	(IOVECTFLG+~DOSCONFLG,pc),a0
 		move.b	d3,(a0)
 		not.b	(a0)
 		bra	paramsw1
@@ -1844,7 +1845,7 @@ param_m:				*-m
 		bra	next_option
 
 param_ms:				*-ms[0/1]	<+08
-		lea	(IOCSMSFLG,pc),a0
+		lea	(IOVECTFLG+~IOCSMSFLG,pc),a0
 		bsr	GetArgChar
 		cmpi.b	#'0',d0
 		bcs	param_ms2
@@ -1914,9 +1915,9 @@ check_param01:
 
 param_g:				*-g[0/1]
 		bsr	check_param01
-		lea	(IOCSCONFLG,pc),a0
+		lea	(IOVECTFLG+~IOCSCONFLG,pc),a0
 		move.b	d1,(a0)			;IOCSCONFLG
-		addq.l	#DOSCONFLG-IOCSCONFLG,a0
+		addq.l	#~DOSCONFLG-~IOCSCONFLG,a0
 		move.b	d1,(a0)+		;DOSCONFLG
 		move.b	d1,(a0)			;IOCSMSFLG
 		bra	next_option
@@ -2184,7 +2185,7 @@ FLAG_M:		.ds.b	1		*/m  v1.1 IOCS _MS_PATSTのバグパッチ
 FLAG_F:		.ds.b	1		*/f  フォントファイル指定
 FLAG_DEV:	.ds.b	1		*デバイスドライバ起動フラグ
 
-VECTFLG:	.ds.b	5		*=VECTFLGSIZE
+VECTFLG:	.ds.b	VECTFLGSIZE
 
 		.even
 filename_buf:	.ds.b	90
