@@ -46,6 +46,7 @@
 		.xref	txbox,txfill,txline,txrev,txxline,txyline
 		.xref	fputc,fputs,conctrl,inpout,print,write
 		.xref	clear_mpu_cache
+		.xref	txrascpy
 
 
 * Fixed Numbers ----------------------- *
@@ -647,6 +648,7 @@ iocsctbl:
 	viocsc	_SETFNTADR,chr_adr
 	viocsc	_OS_CURON,os_curon
 	viocsc	_OS_CUROF,os_curof
+	viocsc	_TXRASCPY,txrascpy
 flagjctrl:				*(/jスイッチが指定されたら-1を書き込む)
 	viocsc	_SFTJIS,sftjis
 	viocsc	_JISSFT,jissft

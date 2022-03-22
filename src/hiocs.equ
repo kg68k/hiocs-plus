@@ -206,9 +206,11 @@ DRAWMODE:	.equ	$d1a	*w	(0:通常 1:反転)
 _CRTC21:	.equ	$e8002a	*レジスタ21(テキスト同時アクセス)
 _CRTC22:	.equ	$e8002c	*レジスタ22(ラスターコピーレジスタ)
 _CRTC23:	.equ	$e8002e	*レジスタ23(ビットマスクレジスタ)
+_CRTC_ACT:	.equ	$e80480	*動作ポート
 _GRAPHPAL:	.equ	$e82000	*グラフィックパレットレジスタ
 _TEXTPAL:	.equ	$e82200	*テキストパレットレジスタ
 _MFP_GPIP:	.equ	$e88001	*ＭＦＰレジスタアドレス
+_MFP_DDR:	.equ	$e88005	*データ方向レジスタ
 _MFP_TSR:	.equ	$e8802d	*送信ステータスレジスタ
 _MFP_UDR:	.equ	$e8802f	*ＵＳＡＲＴデータレジスタ
 S_CHRSEL:	.equ	$ed0059	*b |~\ 変換フラグ

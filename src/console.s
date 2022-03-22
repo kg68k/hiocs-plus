@@ -2904,36 +2904,62 @@ putc_eralsdo4:
 
 
 
+*****************************************
+*	IOCS $df	_TXRASCPY	*
+*****************************************
+
+txrascpy::
+	movem.l	d1-d2/d7/a0,-(sp)
+	lea	(_CRTC21),a0
+	move	(a0),d7
+	moveq	#%1111,d0
+	and	d3,d0			*対象プレーン
+	ori	#$0100,d0		*テキスト画面同時アクセス有効
+	move	d0,(a0)
+	move	#$0101,d0		*ポインタを下方向へ移動
+	tst	d3
+	bpl	@f
+	neg	d0			*$feff ポインタを上方法へ移動
+@@:
+	exg	d0,d2			*d0=コピー数 d2=ポインタ増分
+	bsr	putc_rascpy
+	move	d7,(a0)
+	movem.l	(sp)+,d1-d2/d7/a0
+	rts
+
+
 *	ラスターコピーを行なう
 
 putc_rascpy:
-	movem.l	d3/a0,-(sp)
+	subq	#1,d0
+	bcs	putc_rascpy9
+
+	movem.l	d3/a0-a1,-(sp)
 	lea	(_MFP_GPIP),a0
-	clr.b	(4,a0)			*MFP DDR(データ方向)
+	lea	(_CRTC22-_MFP_GPIP,a0),a1
+	clr.b	(_MFP_DDR-_MFP_GPIP,a0)
 	move	sr,d3
-	bra	putc_rascpy3
 putc_rascpy1:
+@@:	tst.b	(a0)					*(for X68030)
+	bmi	@b			*H-SYNCはLow	*
 	ori	#$0700,sr		*割り込み禁止
-putc_rascpy2_:						*(for X68030)
-	tst.b	(a0)					*
-	bmi	putc_rascpy2_		*H-SYNCはLow	*
-putc_rascpy2:
-	tst.b	(a0)
-	bpl	putc_rascpy2		*H-SYNCはHigh
-	move	d1,(_CRTC22-_MFP_GPIP,a0)		*転送ラスターセット
-	move	#$0008,($0454+_CRTC22-_MFP_GPIP,a0)	*ラスターコピー開始
+@@:	tst.b	(a0)
+	bpl	@b			*H-SYNCはHigh
+
+	move	d1,(a1)			*転送ラスターセット
+	move	#%1000,(_CRTC_ACT-_CRTC22,a1)		*ラスターコピー開始
 	move	d3,sr			*割り込み禁止解除
 	add	d2,d1			*次のラスターへ
 putc_rascpy3:
 	dbra	d0,putc_rascpy1
-putc_rascpy4_:						*(for X68030)
-	tst.b	(a0)					*
-	bmi	putc_rascpy4_		*H-SYNCはLow	*
-putc_rascpy4:
-	tst.b	(a0)
-	bpl	putc_rascpy4		*H-SYNCはHigh
-	clr	($0454+_CRTC22-_MFP_GPIP,a0)		*ラスターコピー停止
-	movem.l	(sp)+,d3/a0
+@@:	tst.b	(a0)					*(for X68030)
+	bmi	@b			*H-SYNCはLow	*
+@@:	tst.b	(a0)
+	bpl	@b			*H-SYNCはHigh
+
+	clr	(_CRTC_ACT-_MFP_GPIP,a0)		*ラスターコピー停止
+	movem.l	(sp)+,d3/a0-a1
+putc_rascpy9:
 	rts
 
 
