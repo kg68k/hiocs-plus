@@ -124,18 +124,13 @@ setvect1:
 	move.b	(~IOCSCONFLG,a0),(~IOCSCONFLG,a1)
 	beq	setvect2		*変更しない
 
-		IOCS	_B_CUROFF	*<+08
-		lea	(CSRDRLINE),a2
-		moveq	#3,d0
-		and	(a2),d0
-		bne	@f
-		cmpi	#16*4,(a2)
-		bcs	csrdrline_ok
+	IOCS	_B_CUROFF		*<+08
+
+	move.l	#0<<16+$ffff,(CSRDRLINE)
+	.fail	(CSRDRLINE+2)!=CSRLPAT
 @@:
-		move.l	#0<<16+$ffff,(a2)
-csrdrline_ok:
-		lea	(iocsctbl,pc),a3
-		bsr	chgvecttbl_iocs	*IOCSベクタを変更する
+	lea	(iocsctbl,pc),a3
+	bsr	chgvecttbl_iocs		*IOCSベクタを変更する
 
 	lea	(OLDCSRVC,pc),a2
 	move.l	(CSRTADR),(a2)		*timer-C カーソル点滅処理アドレス
@@ -1017,8 +1012,6 @@ dev_init2:
 		sf	(a1)+
 		dbra	d0,dev_init2
 
-		bsr	csrpat_init
-
 		lea	(VECTFLG,pc),a0
 		lea	(IOVECTFLG,pc),a1
 		bsr	setvect		*ベクタを変更する
@@ -1046,10 +1039,6 @@ dev_init_err_mpu:
 		move	#$500c,d0
 		rts
 		.cpu	CPU
-
-csrpat_init:
-		move	#0<<16+$ffff,(CSRDRLINE)
-		rts
 
 *	8×16半角フォントをＲＡＭ上に転送する
 
@@ -1525,8 +1514,6 @@ cmd_exec52:
 	move.b	(a1),(a0)+
 	sf	(a1)+
 	dbra	d0,cmd_exec52
-
-		bsr	csrpat_init
 
 		lea	(VECTFLG,pc),a0
 		lea	(IOVECTFLG,pc),a1
