@@ -1,0 +1,264 @@
+		.nlist
+
+*		.title	HIOCS PLUS v16.09 (hiocs.equ)
+
+*****************************************************************
+*	HIOCS version 1.10+16
+*		< HIOCS.EQU >
+*	$Id: HIOCS.EQ_ 1.9 93/04/02 23:37:44 YuNK Exp $
+*
+*		Copyright 1990-93  SHARP / Y.Nakamura
+*****************************************************************
+
+
+* HIOCS PLUS Version ------------------ *
+
+program:	.reg	'HIOCS PLUS'
+version:	.reg	'16.14'
+date:		.reg	'2002/07/13'
+author:		.reg	'立花えり子'
+
+
+* Target MPU -------------------------- *
+
+		.ifndef	CPU
+CPU:		.equ	68000
+		.endif
+
+		.ifndef	UNROLL
+		.if	CPU>=68020
+UNROLL:		.equ	0
+		.else
+UNROLL:		.equ	1
+		.endif
+		.endif
+
+
+		.if	CPU==68000
+HIOCS_ID:	.reg	'HIOCS PLUS '
+		.elseif	CPU==68030
+HIOCS_ID:	.reg	'HIOCS P030 '
+		.else
+		.fail	1
+		.endif
+
+		.cpu	CPU
+
+
+* Fixed Number ------------------------ *
+
+CR:		.equ	13
+LF:		.equ	10
+
+* 680x0 命令コード -------------------- *
+
+NOP:		.equ	$4e71
+RTE:		.equ	$4e73
+RTS:		.equ	$4e75
+MOVEM:		.equ	$48e7
+BRA_W:		.equ	$6000
+BNE_W:		.equ	$6600
+
+*=======================================*
+*	ＣＰＵベクタ			*
+*=======================================*
+
+SPURIVEC:	.equ	$000060 *スプリアス
+TRAPFVEC:	.equ	$0000bc	*trap #15
+TIMERCVEC:	.equ	$000114	*MFP Timer-C
+SCCBRCVEC:	.equ	$000150	*SCC-B １バイト入力
+SCCBRCVEC2:	.equ	$000154	*(SCC-B １バイト入力)
+
+
+*=======================================*
+*	ＩＯＣＳワークエリア		*
+*=======================================*
+
+KBUFNUM:	.equ	$000812	*w キーバッファに入っているキーの数
+MSRCVCNT:	.equ	$00092a	*w マウスデータの受信カウンタ
+MSRCVPTR:	.equ	$00092c	*l マウスデータの受信バッファポインタ
+MSRCVBUF:	.equ	$000930	*- マウスデータの受信バッファ(～$000932 3bytes)
+MSCTRLFLG:	.equ	$000933	*b 現在のMSCTRL端子の状態
+MSSKEYVECT:	.equ	$000934	*l マウス受信データ処理アドレス(ソフトキーボード)
+MSCSRVECT:	.equ	$000938	*l 			       (マウスカーソル)
+TXLLEN:		.equ	$000940	*w テキストＶＲＡＭ１ラインのバイト数
+TXADR:		.equ	$000944	*l アクセスするテキストＶＲＡＭの開始アドレス
+TXSTOFST:	.equ	$000948	*l テキスト表示開始アドレスオフセット
+TXXMIN:		.equ	$000954	*w テキストクリッピングエリア(Ｘ最小値)
+TXYMIN:		.equ	$000956	*w			     (Ｙ最小値)
+TXXMAX:		.equ	$000958	*w			     (Ｘ最大値＋１)
+TXYMAX:		.equ	$00095a	*w			     (Ｙ最大値＋１)
+GRADR:		.equ	$00095c	*l アクセスするグラフィックＶＲＡＭの開始アドレス
+GRLLEN:		.equ	$000960	*l グラフィックＶＲＡＭ１ラインのバイト数
+GRCOLMAX:	.equ	$000964	*w グラフィック画面の色数－１(0ならグラフィック使用不可)
+GRXMIN:		.equ	$000968	*w グラフィッククリッピングエリア(Ｘ最小値)
+GRYMIN:		.equ	$00096a	*w				 (Ｙ最小値)
+GRXMAX:		.equ	$00096c	*w				 (Ｘ最大値)
+GRYMAX:		.equ	$00096e	*w				 (Ｙ最大値)
+CSRXMAX:	.equ	$000970	*w テキストの桁数－１
+CSRYMAX:	.equ	$000972	*w テキストの行数－１
+CSRX:		.equ	$000974	*w 現在のカーソルＸ座標
+CSRY:		.equ	$000976	*w 現在のカーソルＹ座標
+BEEPADR:	.equ	$000978 *l ＢＥＥＰ音ＰＣＭデータアドレス
+BEEPLEN:	.equ	$00097c	*w ＢＥＥＰ音ＰＣＭデータ長
+ESCEXVECT:	.equ	$00097e *l ESC [ の拡張シーケンス処理アドレス
+ESCSQPTR:	.equ	$000982	*l ESCシーケンスバッファへのポインタ
+ESCSQBUF:	.equ	$000986 *- ESCシーケンスバッファ(10bytes)
+FIRSTBYTE:	.equ	$000990	*b ２バイト文字などの１バイト目
+CSRSTAT:	.equ	$000991	*b カーソル点滅の状態(<>0で点灯)
+CSRSWITCH:	.equ	$000992	*b カーソル表示スイッチ(<>0で表示)
+CSRSW:		.equ	$000993	*b アプリケーション用カーソル表示スイッチ(=0で表示)
+TXCOLOR:	.equ	$000994	*b 現在のテキストカラーコード(0～15)
+TXCOLSAVE:	.equ	$000995	*b ESC [sによる表示色の保存エリア
+CSRXYSAVE:	.equ	$000996	*l ESC [sによるカーソル位置の保存エリア
+USKFONT0:	.equ	$00099a	*l 外字グループ０(16×16:$2c21～$2d7e)のフォントアドレス
+USKFONT1:	.equ	$00099e	*l	       １(16×16:$7621～$777e)
+USKFONT2:	.equ	$0009a2	*l	       ２(８×16:$f400～$f5ff)
+USKFONT3:	.equ	$0009a6	*l	       ３(24×24:$2c21～$2d7e)
+USKFONT4:	.equ	$0009aa	*l	       ４(24×24:$7621～$777e)
+USKFONT5:	.equ	$0009ae	*l	       ５(12×24:$f400～$f5ff)
+
+MSTINIT:	.equ	$0009b2	*w マウスデータ受信タイマー初期値
+MSTIMER:	.equ	$0009b4	*w 		   タイマーカウンタ
+MSTADR:		.equ	$0009b6	*l 		   処理アドレス
+CSRTINIT:	.equ	$0009ba	*w カーソル点滅タイマー初期値
+CSRTIMER:	.equ	$0009bc	*w 	       タイマーカウンタ
+CSRTADR:	.equ	$0009be	*l 	       処理アドレス
+FDTINIT:	.equ	$0009c2	*w ＦＤモーター停止タイマー初期値
+FDTIMER:	.equ	$0009c4	*w 		   タイマーカウンタ
+FDTADR:		.equ	$0009c6	*l 		   処理アドレス
+ALMTINIT:	.equ	$0009ca	*w アラーム電源ＯＦＦタイマー初期値
+ALMTIMER:	.equ	$0009cc	*w 		     タイマーカウンタ
+ALMTADR:	.equ	$0009ce	*l 		     処理アドレス
+
+IOCSNUM:	.equ	$000a0e	*w 現在処理中のIOCSコール番号(なければ-1)
+
+*	(b) … v1.1ROM以降では上位バイトのみ使用するワーク
+*	(-) … v1.1ROM以降では未使用のワーク
+
+MSTXADR3:	.equ	$000a7a	*l マウスカーソル表示ページ開始アドレス(プレーン３)
+MSTXADR2:	.equ	$000a7e	*l 				       (プレーン２)
+MSVBCHK:	.equ	$000a82	*w マウスカーソル表示時に垂直同期チェックをするなら<>0
+MSMVLIM:	.equ	$000a84	*w _MS_OFFTM/ONTMにおいてマウスが移動したとみなすドット数
+MSASPEED:	.equ	$000a86	*w マウスカーソルアニメーション速度
+MSCOLMIN:	.equ	$000a8c	*w(-) マウスカーソル表示可能なカラム開始位置($0000)
+MSLINEMIN:	.equ	$000a8e	*w(-)			      ライン開始位置($0000)
+MSCOLMAX:	.equ	$000a90	*w(-) 			      カラム終了位置($0080)
+MSLINEMAX:	.equ	$000a92	*w(-) 			      ライン終了位置($03f0)
+MSTXLLEN:	.equ	$000a98	*w(-) テキストＶＲＡＭ１ラインのバイト数
+MSXMIN:		.equ	$000a9a	*w マウスカーソル移動範囲(Ｘ最小値)
+MSYMIN:		.equ	$000a9c	*w 			 (Ｙ最小値)
+MSXMAX:		.equ	$000a9e	*w 			 (Ｘ最大値)
+MSYMAX:		.equ	$000aa0	*w 			 (Ｙ最大値)
+MSCSRSW:	.equ	$000aa2	*w(b) マウスカーソル表示スイッチ(-1で表示)
+MSCSRPAT:	.equ	$000aa4	*l パターンデータ本体へのポインタ(6+1個分)
+MSAPATN:	.equ	$000ac0	*w マウスカーソルアニメーションの表示番号
+MSASCNT:	.equ	$000ac2	*w マウスカーソルアニメーション速度カウンタ
+MSANIMSW:	.equ	$000ac4	*w(b) マウスカーソルアニメーションをするなら-1
+MSLEFT:		.equ	$000ac6	*w マウス左ボタンの状態(押されたら-1)
+MSRIGHT:	.equ	$000ac8	*w マウス右ボタンの状態(押されたら-1)
+MSMOVEX:	.equ	$000aca	*w マウスＸ方向移動量
+MSMOVEY:	.equ	$000acc	*w マウスＹ方向移動量
+MSCSRX:		.equ	$000ace	*w マウスカーソルＸ座標
+MSCSRY:		.equ	$000ad0	*w マウスカーソルＹ座標
+MSSAVEX:	.equ	$000ad2	*w マウスカーソルＸ座標保存ワーク
+MSSAVEY:	.equ	$000ad4	*w マウスカーソルＹ座標保存ワーク
+MSHOTX:		.equ	$000ad6	*w マウスカーソルのホットスポットＸ座標
+MSHOTY:		.equ	$000ad8	*w マウスカーソルのホットスポットＹ座標
+MSCSRWCOL:	.equ	$000ada	*w(-) マウスカーソル表示開始カラム(Ｘ方向バイト位置)
+MSCSRWLINE:	.equ	$000adc	*w(-) 			開始ライン
+MSIOCSJOB:	.equ	$000ade	*w(b) IOCSコールマウス処理中なら-1
+
+*	(v1.0ROMの場合)
+MSSAVE2:	.equ	$000af0	*- テキストＶＲＡＭ保存エリア(プレーン２)
+MSSAVE3:	.equ	$000b10	*- 			     (プレーン３)
+MSWPAT2:	.equ	$000b30	*- マウスカーソルパターン合成用ワーク(プレーン２)
+MSWPAT3:	.equ	$000b50	*- 				     (プレーン３)
+*	(v1.1ROM以降の場合)
+MSVRAM2:	.equ	$000af0	*- テキストＶＲＡＭ保存エリア(プレーン２)
+MSVRAM3:	.equ	$000b30	*- 			     (プレーン３)
+
+MSCSRTBL:	.equ	$000b70	*l マウスカーソルパターンデータへのポインタ(16個分)
+MSJOBFLG:	.equ	$000bbf	*b マウス受信データ処理フラグ(処理中ならb7=1)
+MSSKEYJOB:	.equ	$000bc4	*b ソフトキーボード処理中なら1
+
+MKFONTBUF:	.equ	$000c46	*- フォント作成用バッファ(～$000c8d:72bytes)
+MSRCVDATA:	.equ	$000cb1	*- マウスからの生受信データ(～$000cb3 3bytes)
+*
+
+*	(v1.3ROM以降で新設されたワーク)
+
+MPUTYPE:	.equ	$cbc	*b
+
+SCROLLMOD:	.equ	$d08	*w	(0:ラスタコピー -1:ソフトスクロール)
+SMTSCROLL:	.equ	$d0a	*w	(0:ジャンプ 4,8,16:スムース)
+CSRWINKSW:	.equ	$d0c	*w	(0:点滅 -1:表示したまま)
+CSRDRLINE:	.equ	$d0e	*w	(反転開始ライン×4)
+CSRLPAT:	.equ	$d10	*w	(反転パターン:0ならバッファパターンで描画)
+EXBEEPVEC:	.equ	$d12	*l	(BEEP 音アドレスが -1 の時に有効)
+ESCSUBSTVEC:	.equ	$d16	*l	(^[[ 系のみ、0 なら標準)
+
+DRAWMODE:	.equ	$d1a	*w	(0:通常 1:反転)
+
+*=======================================*
+*	Ｉ／Ｏポートアドレス		*
+*=======================================*
+
+_CRTC21:	.equ	$e8002a	*レジスタ21(テキスト同時アクセス)
+_CRTC22:	.equ	$e8002c	*レジスタ22(ラスターコピーレジスタ)
+_CRTC23:	.equ	$e8002e	*レジスタ23(ビットマスクレジスタ)
+_GRAPHPAL:	.equ	$e82000	*グラフィックパレットレジスタ
+_TEXTPAL:	.equ	$e82200	*テキストパレットレジスタ
+_MFP_GPIP:	.equ	$e88001	*ＭＦＰレジスタアドレス
+_MFP_TSR:	.equ	$e8802d	*送信ステータスレジスタ
+_MFP_UDR:	.equ	$e8802f	*ＵＳＡＲＴデータレジスタ
+S_CHRSEL:	.equ	$ed0059	*b |~\ 変換フラグ
+_SCCCMD_B:	.equ	$e98001	*SCC チャンネルＢコマンドレジスタ
+_SCCDATA_B:	.equ	$e98003	*		 データレジスタ
+
+
+*=======================================*
+*	ＲＯＭフォント格納アドレス	*
+*=======================================*
+
+fon_ank6:	.equ	$ffd018	*６×12 半角フォント格納アドレス(v1.0新 ROM)
+fon_sml8:	.equ	$f3a000	*８×８ 1/4角フォント
+fon_ank8:	.equ	$f3a800	*８×16 半角フォント
+fon_knj16:	.equ	$f00000	*16×16 全角フォント
+fon_sml12:	.equ	$f3b800	*12×12 1/4角フォント
+fon_ank12:	.equ	$f3d000	*12×24 半角フォント
+fon_knj24:	.equ	$f40000	*24×24 全角フォント
+
+
+* End of File ------------------------ *
+
+*	$Log:	HIOCS.EQ_ $
+* Revision 1.9  93/04/02  23:37:44  YuNK
+* ラスターコピー処理を改善し，X68030で正常動作するようにした。
+* 
+* Revision 1.8  93/02/15  00:36:32  YuNK
+* CONFIG.SYSの program= 行での登録ができるようにした。
+* 
+* Revision 1.7  92/11/16  20:06:36  YuNK
+* マウス周りの処理の一部変更
+* 
+* Revision 1.6  92/10/28  10:33:52  YuNK
+* ベクタ変更処理の一部変更、カーソル表示処理の変更。
+* 
+* Revision 1.5  92/10/11  00:27:46  YuNK
+* バグ取り
+* 
+* Revision 1.4  92/09/21  14:47:02  YuNK
+* バグ取り
+* 
+* Revision 1.3  92/09/18  13:26:34  YuNK
+* バグ取り
+* 
+* Revision 1.2  92/09/16  14:47:34  YuNK
+* ＳＸウィンドウでマウスが動作しないバグ取り
+* 
+* Revision 1.1  92/09/14  01:18:10  YuNK
+* Initial revision
+* 
+
+		.list
