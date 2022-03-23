@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.08 (mouse.s)
+		.title	HIOCS PLUS (mouse.s)
 
 *****************************************************************
 *	HIOCS version 1.10

@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.08 (graph.s)
+		.title	HIOCS PLUS (graph.s)
 
 *****************************************************************
 *	HIOCS version 1.10

@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.08 (doscon.s)
+		.title	HIOCS PLUS (doscon.s)
 
 *****************************************************************
 *	HIOCS version 1.10

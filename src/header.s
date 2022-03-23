@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.08 (header.s)
+		.title	HIOCS PLUS (header.s)
 
 *****************************************************************
 *	HIOCS version 1.10

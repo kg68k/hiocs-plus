@@ -1,6 +1,6 @@
 		.nlist
 
-*		.title	HIOCS PLUS v16.09 (hiocs.equ)
+*		.title	HIOCS PLUS (hiocs.equ)
 
 *****************************************************************
 *	HIOCS version 1.10+16
@@ -51,7 +51,6 @@ LF:		.equ	10
 
 * 680x0 命令コード -------------------- *
 
-NOP:		.equ	$4e71
 RTE:		.equ	$4e73
 RTS:		.equ	$4e75
 MOVEM:		.equ	$48e7

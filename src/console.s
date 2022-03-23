@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.09 (console.s)
+		.title	HIOCS PLUS (console.s)
 
 *****************************************************************
 *	HIOCS version 1.10

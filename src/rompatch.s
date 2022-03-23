@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS v16.08 (rompatch.s)
+		.title	HIOCS PLUS (rompatch.s)
 
 *****************************************************************
 *	HIOCS version 1.10
