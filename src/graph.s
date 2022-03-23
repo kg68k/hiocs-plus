@@ -74,8 +74,8 @@ L00174a:				*描画前に同時アクセスモードだった場合
 *	水平描画の実処理
 
 L001772:
-	lea	L001772(pc),a0
-	rts
+	lea	(@f,pc),a0
+@@:	rts
 txxlxor:				*xorモードで描画
 	movea.w	#-1,a0
 	bra	L00177c
@@ -376,24 +376,15 @@ L001a02:
 	lsr	#4,d1
 	lea	L001a12(pc),a0
 	bra	L001a14
+	.quad
 L001a10:				*16ライン描画
-	move	d0,$0780(a1)
-	move	d0,$0700(a1)
-	move	d0,$0680(a1)
-	move	d0,$0600(a1)
-	move	d0,$0580(a1)
-	move	d0,$0500(a1)
-	move	d0,$0480(a1)
-	move	d0,$0400(a1)
-	move	d0,$0380(a1)
-	move	d0,$0300(a1)
-	move	d0,$0280(a1)
-	move	d0,$0200(a1)
-	move	d0,$0180(a1)
-	move	d0,$0100(a1)
-	move	d0,$0080(a1)
-	move	d0,(a1)
-	nop
+	i:=$80*15
+	.rept	15
+	move	d0,(i.w,a1)
+	i:=i-$80
+	.endm
+	move	d0,(a1)			*合わせて2.wにする
+	jmp	(a0)			*
 L001a6a:
 	jmp	(a0)
 L001a12:
@@ -401,26 +392,35 @@ L001a12:
 L001a14:
 	dbra	d1,L001a10
 L001a18:
-	and.w	#$000f,d3
-	add.w	d3,d3
-	add.w	d3,d3
-	neg.w	d3
-	lea	L001a6c(pc),a0
-	jmp	L001a6a(pc,d3.w)
+	andi	#$000f,d3		*端数の0～15ライン描画
+	lea	(L001a6c,pc),a0
+	neg	d3
+.if CPU>=68020
+	jmp	(L001a6a,pc,d3.w*4)
+.else
+	add	d3,d3
+	add	d3,d3
+	jmp	(L001a6a,pc,d3.w)
+.endif
 
 *	ラインパターン指定の描画
 
-txylpat1:
-	rol.b	#1,d6
-	bcc	txylpat2
-	move	d0,(a1)
-	bra	txylpat3
-txylpat2:
-	clr.w	(a1)
-txylpat3:
-	adda.w	d4,a1
 txylpat:
-	dbra	d3,txylpat1
+	moveq	#0,d1
+	bra	txylpat_start
+txylpat_loop:
+	rol.b	#1,d6
+	bcc	txylpat_clr
+
+	move	d0,(a1)
+	adda	d4,a1
+	dbra	d3,txylpat_loop
+	bra	L001a6c
+txylpat_clr:
+	move	d1,(a1)
+	adda	d4,a1
+txylpat_start:
+	dbra	d3,txylpat_loop
 L001a6c:
 	clr.w	(a3)
 txyline_rte::
@@ -563,16 +563,17 @@ L001cac:
 	move	(a2),-(sp)
 	move	d4,(a2)			*テキストビットマスクＯＮ
 
-	move	d6,-(sp)		;move	d6,d4	*ラインスタイル
-	move	(sp),d5			;andi	#$ff00,d4
-	move.b	(sp)+,d5		;move	d4,d5
-					;lsr	#8,d5
-					;or	d4,d5
+*	d6.bはtxxlpsetでd6.lの各バイトにコピーされる(偶数ライン目用)
+*	一度txxlpsetを呼ぶとa0.lが事前処理を省いたアドレスに書き換わるので
+*	ここでd6.hbをa6.lの各バイトにコピーする(奇数ライン目用)
+	move	d6,-(sp)
+	move	d6,d5
+	move.b	(sp)+,d5
 	move	d5,d4
 	swap	d5
 	move	d4,d5
-
 	movea.l	d5,a6
+
 	lea	(txxlpset,pc),a0
 	bsr	L001ce8
 	move	(sp)+,(a2)
