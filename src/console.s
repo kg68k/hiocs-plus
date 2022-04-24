@@ -30,6 +30,20 @@
 		.xref	USRKNJ2FLG,USRKNJFLG
 
 
+* Macros ------------------------------ *
+
+	.offset	0
+~jobadr:  .dc	0
+~fntadr:  .dc.l	0
+~knjflag: .dc.b	0
+~jisflag: .dc.b	0
+sizeof_CHRTABLE:
+
+LEA_CHRTABLE: .macro firstbyte,member,areg
+	lea	(chrtable+(sizeof_CHRTABLE*firstbyte)+member,pc),areg
+	.endm
+
+
 * Text Section ------------------------ *
 
 		.text
@@ -77,8 +91,8 @@ b_putmes4:
 	moveq	#' ',d1
 b_putmes5:
 	lsl	#3,d1
-	movea.l	(2,a4,d1.w),a0
-	move.b	(7,a4,d1.w),d0
+	movea.l	(~fntadr,a4,d1.w),a0
+	move.b	(~jisflag,a4,d1.w),d0
 	ble	b_putmes10		*mi or eq(半角文字)
 	moveq	#0,d1
 	move.b	(a1)+,d1		*下位バイト
@@ -429,11 +443,11 @@ putc_log0:
 	lsl	#3,d2
 	lea	(chrtable,pc),a3
 	lea	(a3,d2.w),a0
-	move	(a0)+,d2
-	tst.b	(5,a0)
-	bgt.s	putc_log01
+	move	(a0)+,d2		*~jobadr
+	tst.b	(~jisflag-2,a0)
+	bgt	@f
 	jsr	(a2)			*!(mi or eq)
-putc_log01:
+@@:
 	jmp	(a3,d2.w)
 
 putc_log1:				*文字コードの続き
@@ -470,12 +484,12 @@ putc_log5:				*IOCS _FNTADRのベクタが変更されている場合
 	bcc.s	putc_log4		*２バイト文字
 .if CPU>=68020
 ;d0.b == 0
-		tst.b	(chrtable+7,pc,d1.w*8)
+	tst.b	(chrtable+~jisflag,pc,d1.w*8)
 .else
-		move	d1,d0
-		lsl	#3,d0
-		lea	(chrtable+7,pc),a3
-		move.b	(a3,d0.w),d0
+	move	d1,d0
+	lsl	#3,d0
+	LEA_CHRTABLE $00,~jisflag,a3
+	move.b	(a3,d0.w),d0
 .endif
 	ble.s	putc_log4		*mi or eq
 	move.b	d1,(FIRSTBYTE)		*２バイト文字の１バイト目
@@ -518,7 +532,7 @@ putc0:
 		lsl	#3,d0
 		lea	(chrtable,pc,d0.w),a0
 .endif
-		move	(a0)+,d0
+		move	(a0)+,d0	*~jobadr
 		jmp	(chrtable,pc,d0.w)
 
 putc1:					*文字コードの続き
@@ -550,11 +564,11 @@ putc5:					*IOCS _FNTADRのベクタが変更されている場合
 	cmpi	#$0100,d1
 	bcc.s	putc4			*２バイト文字
 .if CPU>=68020
-		tst.b	(chrtable+7,pc,d1.w*8)
+		tst.b	(chrtable+~jisflag,pc,d1.w*8)
 .else
 		move	d1,d0
 		lsl	#3,d0
-		move.b	(chrtable+7,pc,d0.w),d0
+		move.b	(chrtable+~jisflag,pc,d0.w),d0
 .endif
 	ble.s	putc4			*mi or eq
 	move.b	d1,(FIRSTBYTE)		*２バイト文字の１バイト目
@@ -1047,12 +1061,12 @@ putc_first:
 putc_2bB:
 	move	d1,d2
 	clr.b	d2
-	eor	d2,d1
-	lsr	#5,d2
+	eor	d2,d1			*andi #$00ff,d1
+	lsr	#5,d2			*d2.w = 上位バイト*sizeof_CHRTABLE
 putc_2bB1:
 	lea	(chrtable,pc),a0
-	move.b	(7,a0,d2.w),d0
-	movea.l	(2,a0,d2.w),a0
+	move.b	(~jisflag,a0,d2.w),d0
+	movea.l	(~fntadr,a0,d2.w),a0
 	beq	putc_undef		*未定義コード
 	bpl	putc_2bA1
 
@@ -1314,11 +1328,11 @@ putc_wpat1:
 	rts
 
 putc_wpat2:
-		bhi	putc_wpat3		;カーソルが画面右端を越えている
-		move.l	a0,-(sp)
-		movea.l	(chrtable+' '*8+2,pc),a0
-		bsr	putc_bpat1
-		movea.l	(sp)+,a0
+	bhi	putc_wpat3		*カーソルが画面右端を越えている
+	move.l	a0,-(sp)
+	movea.l	(chrtable+(' '*sizeof_CHRTABLE)+~fntadr,pc),a0
+	bsr	putc_bpat1
+	movea.l	(sp)+,a0
 putc_wpat3:				*改行する
 	pea	(putc_wpat1,pc)
 	moveq	#0,d2
@@ -1839,11 +1853,11 @@ chr_adr21:
 *	８×８ 1/4角フォントアドレス設定
 
 chr_adr30:
-	lea	(chrtable+2+$f0*8,pc),a0
+	LEA_CHRTABLE $f0,~fntadr,a0
 	moveq	#4-1,d3
 chr_adr31:
 	move.l	d1,(a0)
-	addq.l	#8,a0
+	addq.l	#sizeof_CHRTABLE,a0
 	dbra	d3,chr_adr31
 	bra	chr_adr90
 
@@ -1851,21 +1865,21 @@ chr_adr31:
 
 chr_adr40:
 	move.l	d1,-(sp)
-	lea	(chrtable+2,pc),a0
+	LEA_CHRTABLE $00,~fntadr,a0
 	moveq	#$7f,d3
 chr_adr41:
 	move.l	d1,(a0)			*$00～$7f	<+05
-	addq.l	#8,a0
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#16,d1
 	dbra	d3,chr_adr41
 	move.l	(sp),d1
 	move.l	d1,(a0)			*$80
 	add.l	#$a0*16,d1
-	lea	(chrtable+2+$a0*8,pc),a0
+	LEA_CHRTABLE $a0,~fntadr,a0
 	moveq	#$df-$a0,d3
 chr_adr43:
 	move.l	d1,(a0)			*$a0～$df
-	addq.l	#8,a0
+	addq.l	#sizeof_CHRTABLE,a0
 	addq.l	#8,d1				;add.l	#16,d1
 	addq.l	#8,d1				;
 	dbra	d3,chr_adr43
@@ -1879,14 +1893,14 @@ chr_adr50:
 	bsr	chr_adr600		*非漢字
 	lea	(FONTKNJ16A,pc),a0
 	move.l	d1,(a0)
-	lea	(chrtable+2+$85*8,pc),a0
+	LEA_CHRTABLE $85,~fntadr,a0
 	clr.l	(a0)			*$85
-	move	#5,(4,a0)
-	move.l	#-$0bc0,(8,a0)		*$86
-	move	#6,(12,a0)
-	move.l	#$0bc0,(16,a0)		*$87
-	move	#7,(20,a0)
-	move	#8,(28,a0)
+	move	#5,((~knjflag-~fntadr),a0)
+	move.l	#-$0bc0,(sizeof_CHRTABLE,a0)	*$86
+	move	#6,(sizeof_CHRTABLE+(~knjflag-~fntadr),a0)
+	move.l	#$0bc0,(sizeof_CHRTABLE*2,a0)	*$87
+	move	#7,(sizeof_CHRTABLE*2+(~knjflag-~fntadr),a0)
+	move	#8,(sizeof_CHRTABLE*3+(~knjflag-~fntadr),a0)	*$88
 
 	add.l	#$5e00,d1
 	bsr	chr_adr700		*第１水準漢字
@@ -1897,16 +1911,16 @@ chr_adr50:
 	bsr	chr_adr800		*第２水準漢字
 	lea	(FONTKNJ16C,pc),a0
 	move.l	d1,(a0)
-	lea	(chrtable+2+4+$98*8,pc),a0
+	LEA_CHRTABLE $98,~knjflag,a0
 	move	#-1<<8|2,(a0)
-	lea	(chrtable+2+$ec*8,pc),a0
-	move	#9,(-4,a0)		*$eb
+	LEA_CHRTABLE $ec,~fntadr,a0
+	move	#9,(-sizeof_CHRTABLE+(~knjflag-~fntadr),a0)	*$eb
 	move.l	#$0bc0,d1
 	moveq	#$ef-$ec,d3
 chr_adr51:
 	move.l	d1,(a0)			*$ec～$ef
-	move	#10,(4,a0)
-	addq.l	#8,a0
+	move	#10,((~knjflag-~fntadr),a0)
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr51
 
@@ -1919,39 +1933,39 @@ chr_adr60:
 	pea	(chr_adr90,pc)
 chr_adr600:
 	move.l	d1,-(sp)
-	lea	(chrtable+2+$81*8,pc),a0
+	LEA_CHRTABLE $81,~fntadr,a0
 	moveq	#$84-$81,d3
 	btst	#0,(USRKNJFLG,pc)	*(tst.b)	<+07
 	beq	chr_adr61
 	moveq	#$88-$81,d3
 chr_adr61:
 	move.l	d1,(a0)			*$81～$84($88)
-	move	#-1<<8|1,(4,a0)
-	addq.l	#8,a0
+	move	#-1<<8|1,((~knjflag-~fntadr),a0)
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr61
 
 	move.b	(USRKNJFLG,pc),d1	*		<+07
 	bmi	chr_adr67
 	bne	chr_adr68
-	lea	(chrtable+2+$85*8,pc),a0
+	LEA_CHRTABLE $85,~fntadr,a0
 	clr.l	(a0)			*$85
-	move	#5,(4,a0)
-	move.l	#-$0bc0,(8,a0)		*$86
-	move	#6,(12,a0)
-	move.l	#$0bc0,(16,a0)		*$87
-	move	#7,(20,a0)
+	move	#5,((~knjflag-~fntadr),a0)
+	move.l	#-$0bc0,(sizeof_CHRTABLE,a0)	*$86
+	move	#6,(sizeof_CHRTABLE+(~knjflag-~fntadr),a0)
+	move.l	#$0bc0,(sizeof_CHRTABLE*2,a0)	*$87
+	move	#7,(sizeof_CHRTABLE*2+(~knjflag-~fntadr),a0)
 	move.l	(FONTKNJ16B,pc),d1	*$88
 	sub.l	#$0bc0,d1
-	move.l	d1,(24,a0)
-	move	#8,(28,a0)
+	move.l	d1,(sizeof_CHRTABLE*3,a0)
+	move	#8,(sizeof_CHRTABLE*3+(~knjflag-~fntadr),a0)
 	bra	chr_adr69
 chr_adr67:
-	lea	(chrtable+6+$85*8,pc),a0
+	LEA_CHRTABLE $85,~knjflag,a0
 	move	#$12,(a0)
-	move	#$13,(8,a0)
+	move	#$13,(sizeof_CHRTABLE,a0)	*$86
 chr_adr68:
-	lea	(chrtable+6+$88*8,pc),a0
+	LEA_CHRTABLE $88,~knjflag,a0
 	move	#11,(a0)
 chr_adr69:
 	move.l	(sp)+,d1
@@ -1964,17 +1978,17 @@ chr_adr70:
 chr_adr700:
 	move.l	d1,-(sp)
 	sub.l	#$0bc0,d1
-	lea	(chrtable+2+$88*8,pc),a0
+	LEA_CHRTABLE $88,~fntadr,a0
 	moveq	#$98-$88,d3
-	cmpi.b	#11,(5,a0)
+	cmpi.b	#11,(~jisflag-~fntadr,a0)
 	beq	chr_adr72
 chr_adr71:
 	move.l	d1,(a0)			*$88($89)～$98
 chr_adr72:
-	addq.l	#8,a0
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr71
-	move	#12,(-8+4,a0)
+	move	#12,(-sizeof_CHRTABLE+(~knjflag-~fntadr),a0)
 	move.l	(sp)+,d1
 	rts
 
@@ -1985,33 +1999,33 @@ chr_adr80:
 chr_adr800:
 	move.l	d1,-(sp)
 	add.l	#$0bc0,d1
-	lea	(chrtable+2+$99*8,pc),a0
-	move	#12,(-8+4,a0)
+	LEA_CHRTABLE $99,~fntadr,a0
+	move	#12,(-sizeof_CHRTABLE+(~knjflag-~fntadr),a0)
 	moveq	#$9f-$99,d3
 chr_adr81:
 	move.l	d1,(a0)			*$99～$9f
-	addq.l	#8,a0
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr81
-	lea	(chrtable+2+$e0*8,pc),a0
+	LEA_CHRTABLE $e0,~fntadr,a0
 	moveq	#$ef-$e0,d3
 chr_adr82:
 	move.l	d1,(a0)			*$e0～$eb($ef)
-	move	#-1<<8|3,(4,a0)
-	addq.l	#8,a0
+	move	#-1<<8|3,((~knjflag-~fntadr),a0)
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr82
 
 	move.b	(USRKNJ2FLG,pc),d1	*		<+08
 	bne	chr_adr89
-	lea	(chrtable+2+$ec*8,pc),a0
-	move	#9,(-4,a0)		*$eb
+	LEA_CHRTABLE $ec,~fntadr,a0
+	move	#9,(-sizeof_CHRTABLE+(~knjflag-~fntadr),a0)	*$eb
 	move.l	#$0bc0,d1
 	moveq	#$ef-$ec,d3
 chr_adr83:
 	move.l	d1,(a0)			*$ec～$ef
-	move	#10,(4,a0)
-	addq.l	#8,a0
+	move	#10,((~knjflag-~fntadr),a0)
+	addq.l	#sizeof_CHRTABLE,a0
 	add.l	#$1780,d1
 	dbra	d3,chr_adr83
 chr_adr89:
@@ -2067,8 +2081,8 @@ fntadr2:
 	lsr	#5,d2
 fntadr3:
 	lea	(chrtable,pc),a0
-	move.b	(7,a0,d2.w),d0
-	movea.l	(2,a0,d2.w),a0
+	move.b	(~jisflag,a0,d2.w),d0
+	movea.l	(~fntadr,a0,d2.w),a0
 	bmi	fntadr_JIS		*ＪＩＳコード
 	beq	fntadr_undef		*未定義コード
 
