@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (console.s)
+	.title	HIOCS PLUS (console.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,23 +11,23 @@
 
 * Include Files ----------------------- *
 
-		.include	doscall.mac
-		.include	iocscall.mac
-		.include	hiocs.equ
+	.include	doscall.mac
+	.include	iocscall.mac
+	.include	hiocs.equ
 
 
 * Global Symbols ---------------------- *
 
-		.xref	old_defchr,old_akconv
-		.xref	CHRSELFLG,VBELLFLG
-		.xref	CSRPAT0,CSRPAT1,CSRSAVE0,CSRSAVE1,CSRPATC,CSRPATSW
-		.xref	EXCHRVECT
-		.xref	FIRSTFLG,FIRSTFNT
-		.xref	FONTANK12,FONTANK6,FONTANK8
-		.xref	FONTKNJ16A,FONTKNJ16B,FONTKNJ16C,FONTKNJ24,FONTSML12
-		.xref	LOGBUFVECT,CONDFLAG,CONESCFLG,CONDSYSCALL
-		.xref	UNDEFCHR,UNDEFJIS,UNDEFPTR
-		.xref	USRKNJ2FLG,USRKNJFLG
+	.xref	old_defchr,old_akconv
+	.xref	CHRSELFLG,VBELLFLG
+	.xref	CSRPAT0,CSRPAT1,CSRSAVE0,CSRSAVE1,CSRPATC,CSRPATSW
+	.xref	EXCHRVECT
+	.xref	FIRSTFLG,FIRSTFNT
+	.xref	FONTANK12,FONTANK6,FONTANK8
+	.xref	FONTKNJ16A,FONTKNJ16B,FONTKNJ16C,FONTKNJ24,FONTSML12
+	.xref	LOGBUFVECT,CONDFLAG,CONESCFLG,CONDSYSCALL
+	.xref	UNDEFCHR,UNDEFJIS,UNDEFPTR
+	.xref	USRKNJ2FLG,USRKNJFLG
 
 
 * Macros ------------------------------ *
@@ -55,7 +55,7 @@ SHIFT_HALF_HIRA: .macro	dn
 
 * Text Section ------------------------ *
 
-		.text
+	.text
 
 *****************************************
 *	IOCS $2f	_B_PUTMES	*
@@ -157,13 +157,13 @@ putmes_knjAB:				*～$889e:非漢字   / $889f～:第１水準
 	bcs	putmes_kanji
 	ext	d0
 .if CPU>=68030
-		lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
+	lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(FONTKNJ16B,pc),a0
-		movea.l	(-11*4,a0,d0.w),a0
-		lea	(-$0bc0,a0),a0
+	add	d0,d0
+	add	d0,d0
+	lea	(FONTKNJ16B,pc),a0
+	movea.l	(-11*4,a0,d0.w),a0
+	lea	(-$0bc0,a0),a0
 .endif
 	bra	putmes_kanji
 
@@ -196,12 +196,12 @@ putmes_knj88:				*～$889e:拡張外字 / $889f～:漢字
 	cmpi.b	#$9f,d1
 	bcs	putmes_extk
 putmes_kanji:				*全角漢字/非漢字
-		lea	(sjis2tbl,pc),a6
+	lea	(sjis2tbl,pc),a6
 .if CPU>=68020
-		move	(a6,d1.w*2),d1
+	move	(a6,d1.w*2),d1
 .else
-		add	d1,d1
-		move	(a6,d1.w),d1
+	add	d1,d1
+	move	(a6,d1.w),d1
 .endif
 	bmi.s	putmes_undef		*未定義コード
 	adda	d1,a0
@@ -234,12 +234,12 @@ putmes_hkanji:				*半角非漢字	<+07
 	cmpi.b	#$9f,d1
 	bcc	putmes_kanji		*～$869e:半角非漢字 / $869f～:全角非漢字
 putmes_hkanji1:
-		lea	(sjis2tbl,pc),a6
+	lea	(sjis2tbl,pc),a6
 .if CPU>=68020
-		move	(a6,d1.w*2),d1
+	move	(a6,d1.w*2),d1
 .else
-		add	d1,d1
-		move	(a6,d1.w),d1
+	add	d1,d1
+	move	(a6,d1.w),d1
 .endif
 	bmi.s	putmes_undef		*未定義コード
 	adda	d1,a0
@@ -339,10 +339,10 @@ b_putmes53:
 	bcs	b_putmes55		*半角文字($a0～$df)
 b_putmes54:
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	(a1)+,d1		*下位バイト
 	beq	b_putmes51		*上位バイトで文字列が終わってしまった
@@ -522,38 +522,38 @@ b_putc1:
 *=======================================*
 
 putc::
-		move.b	(FIRSTBYTE),d0
-		bne	putc1		*２バイト文字,ESCシーケンスの続き
-		cmpi.l	#fntadr,(_FNTADR*4+$400)
-		bne	putc5		*IOCS _FNTADRは内部ルーチンではない
+	move.b	(FIRSTBYTE),d0
+	bne	putc1			*２バイト文字,ESCシーケンスの続き
+	cmpi.l	#fntadr,(_FNTADR*4+$400)
+	bne	putc5			*IOCS _FNTADRは内部ルーチンではない
 
-		cmpi	#$0100,d1
-		bcc	putc_2bB	*２バイト文字
+	cmpi	#$0100,d1
+	bcc	putc_2bB		*２バイト文字
 putc0:
 .if CPU>=68020
-		lea	(chrtable,pc,d1.w*8),a0
+	lea	(chrtable,pc,d1.w*8),a0
 .else
-		move	d1,d0
-		lsl	#3,d0
-		lea	(chrtable,pc,d0.w),a0
+	move	d1,d0
+	lsl	#3,d0
+	lea	(chrtable,pc,d0.w),a0
 .endif
-		move	(a0)+,d0	*~jobadr
-		jmp	(chrtable,pc,d0.w)
+	move	(a0)+,d0		*~jobadr
+	jmp	(chrtable,pc,d0.w)
 
 putc1:					*文字コードの続き
-		bpl	putc_escsq	*ESCシーケンス
+	bpl	putc_escsq		*ESCシーケンス
 
-		clr.b	(FIRSTBYTE)	*２バイト文字の２バイト目	<+03
-		cmpi.l	#fntadr,(_FNTADR*4+$400)
-		beq	putc_2bA	*IOCS _FNTADRは内部ルーチン
+	clr.b	(FIRSTBYTE)		*２バイト文字の２バイト目	<+03
+	cmpi.l	#fntadr,(_FNTADR*4+$400)
+	beq	putc_2bA		*IOCS _FNTADRは内部ルーチン
 .if CPU>=68020
-		lsl	#8,d0
+	lsl	#8,d0
 .else
-		move.b	d0,-(sp)
-		move	(sp)+,d0
+	move.b	d0,-(sp)
+	move	(sp)+,d0
 .endif
-		move.b	d1,d0
-		move	d0,d1
+	move.b	d1,d0
+	move	d0,d1
 putc4:					*IOCS _FNTADRによってフォントアドレスを得る
 	moveq	#8,d2
 	movea.l	(_FNTADR*4+$400),a0
@@ -569,11 +569,11 @@ putc5:					*IOCS _FNTADRのベクタが変更されている場合
 	cmpi	#$0100,d1
 	bcc.s	putc4			*２バイト文字
 .if CPU>=68020
-		tst.b	(chrtable+~jisflag,pc,d1.w*8)
+	tst.b	(chrtable+~jisflag,pc,d1.w*8)
 .else
-		move	d1,d0
-		lsl	#3,d0
-		move.b	(chrtable+~jisflag,pc,d0.w),d0
+	move	d1,d0
+	lsl	#3,d0
+	move.b	(chrtable+~jisflag,pc,d0.w),d0
 .endif
 	ble.s	putc4			*mi or eq
 	move.b	d1,(FIRSTBYTE)		*２バイト文字の１バイト目
@@ -719,10 +719,10 @@ putc_1bsw1:				*\
 	move.b	(CHRSELFLG,pc),d0
 	bne	putc_1b
 .if CPU>=68020
-		lea	([FONTANK8,pc],$80*16),a0
+	lea	([FONTANK8,pc],$80*16),a0
 .else
-		movea.l	(FONTANK8,pc),a0
-		lea	($80*16,a0),a0
+	movea.l	(FONTANK8,pc),a0
+	lea	($80*16,a0),a0
 .endif
 	bra	putc_bpat
 putc_1bsw2:				*|
@@ -731,10 +731,10 @@ putc_1bsw2:				*|
 	move.b	(CHRSELFLG,pc),d0
 	bne	putc_1b
 .if CPU>=68020
-		lea	([FONTANK8,pc],$82*16),a0
+	lea	([FONTANK8,pc],$82*16),a0
 .else
-		movea.l	(FONTANK8,pc),a0
-		lea	($82*16,a0),a0
+	movea.l	(FONTANK8,pc),a0
+	lea	($82*16,a0),a0
 .endif
 	bra	putc_bpat
 putc_1bsw3:				*~
@@ -743,10 +743,10 @@ putc_1bsw3:				*~
 	move.b	(CHRSELFLG,pc),d0
 	bne	putc_1b
 .if CPU>=68020
-		lea	([FONTANK8,pc],$81*16),a0
+	lea	([FONTANK8,pc],$81*16),a0
 .else
-		movea.l	(FONTANK8,pc),a0
-		lea	($81*16,a0),a0
+	movea.l	(FONTANK8,pc),a0
+	lea	($81*16,a0),a0
 .endif
 	bra	putc_bpat
 
@@ -769,14 +769,14 @@ putc_bpat1:
 	add.l	(TXADR),d3		*ＶＲＡＭアドレス
 	movea.l	d3,a3
 	lea	(_CRTC21),a2
-		moveq	#$f,d0
-		and.b	(TXCOLOR),d0
-		move	(a2),d2
+	moveq	#$f,d0
+	and.b	(TXCOLOR),d0
+	move	(a2),d2
 .if CPU>=68020
-		jsr	(putc_btbl,pc,d0.w*2)
+	jsr	(putc_btbl,pc,d0.w*2)
 .else
-		add	d0,d0
-		jsr	(putc_btbl,pc,d0.w)	*色コード別の文字表示ルーチンを呼ぶ
+	add	d0,d0
+	jsr	(putc_btbl,pc,d0.w)	*色コード別の文字表示ルーチンを呼ぶ
 .endif
 	move	d2,(a2)
 	addq	#1,(CSRX)
@@ -881,171 +881,171 @@ putc_bcol3:
 
 putc_bputpat:
 .if UNROLL
-		i:=0
-		.rept	16
-		move.b	(a0)+,(i,a3)
-		i:=i+$0080
-		.endm
+	i:=0
+	.rept	16
+	move.b	(a0)+,(i,a3)
+	i:=i+$0080
+	.endm
 .else
-		moveq	#$80-1,d1
-		moveq	#16/2-1,d3
+	moveq	#$80-1,d1
+	moveq	#16/2-1,d3
 @@:
-		.rept	2
-		move.b	(a0)+,(a3)+
-		adda.l	d1,a3
-		.endm
-		dbra	d3,@b
-		lea	(-$80*16,a3),a3
+	.rept	2
+	move.b	(a0)+,(a3)+
+	adda.l	d1,a3
+	.endm
+	dbra	d3,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	半角１文字分をクリアする
 
 putc_bclrpat:
-		moveq	#0,d0
+	moveq	#0,d0
 .if UNROLL
-		i:=0
-		.rept	16
-		move.b	d0,(i,a3)
-		i:=i+$0080
-		.endm
+	i:=0
+	.rept	16
+	move.b	d0,(i,a3)
+	i:=i+$0080
+	.endm
 .else
-		moveq	#$80-1,d1
-		moveq	#16/2-1,d3
+	moveq	#$80-1,d1
+	moveq	#16/2-1,d3
 @@:
-		.rept	2
-		move.b	d0,(a3)+
-		adda.l	d1,a3
-		.endm
-		dbra	d3,@b
-		lea	(-$80*16,a3),a3
+	.rept	2
+	move.b	d0,(a3)+
+	adda.l	d1,a3
+	.endm
+	dbra	d3,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	半角文字パターンを反転表示する
 
 putc_bputrev:
 .if UNROLL
-		i:=0
-		.rept	4
-		move.l	(a0)+,d0
-		not.l	d0
-		move.b	d0,(i+$0180,a3)
-		swap	d0
-		move.b	d0,(i+$0080,a3)
-		ror.l	#8,d0
-		move.b	d0,(i+$0000,a3)
-		swap	d0
-		move.b	d0,(i+$0100,a3)
-		i:=i+$0200
-		.endm
+	i:=0
+	.rept	4
+	move.l	(a0)+,d0
+	not.l	d0
+	move.b	d0,(i+$0180,a3)
+	swap	d0
+	move.b	d0,(i+$0080,a3)
+	ror.l	#8,d0
+	move.b	d0,(i+$0000,a3)
+	swap	d0
+	move.b	d0,(i+$0100,a3)
+	i:=i+$0200
+	.endm
 .else
-		moveq	#4-1,d1
+	moveq	#4-1,d1
 @@:
-		move.l	(a0)+,d0
-		not.l	d0
-		move.b	d0,($0180,a3)
-		swap	d0
-		move.b	d0,($0080,a3)
-		ror.l	#8,d0
-		move.b	d0,($0000,a3)
-		swap	d0
-		move.b	d0,($0100,a3)
-		lea	($0200,a3),a3
-		dbra	d1,@b
-		lea	(-$80*16,a3),a3
+	move.l	(a0)+,d0
+	not.l	d0
+	move.b	d0,($0180,a3)
+	swap	d0
+	move.b	d0,($0080,a3)
+	ror.l	#8,d0
+	move.b	d0,($0000,a3)
+	swap	d0
+	move.b	d0,($0100,a3)
+	lea	($0200,a3),a3
+	dbra	d1,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	半角文字パターンを強調表示する
 
 putc_bputbld:
-		move.l	#$7f7f7f7f,d0
+	move.l	#$7f7f7f7f,d0
 .if UNROLL
-		i:=0
-		.rept	4
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		move.b	d1,(i+$0180,a3)
-		swap	d1
-		move.b	d1,(i+$0080,a3)
-		ror.l	#8,d1
-		move.b	d1,(i+$0000,a3)
-		swap	d1
-		move.b	d1,(i+$0100,a3)
-		i:=i+$0200
-		.endm
+	i:=0
+	.rept	4
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	move.b	d1,(i+$0180,a3)
+	swap	d1
+	move.b	d1,(i+$0080,a3)
+	ror.l	#8,d1
+	move.b	d1,(i+$0000,a3)
+	swap	d1
+	move.b	d1,(i+$0100,a3)
+	i:=i+$0200
+	.endm
 .else
-		move.l	d7,-(sp)
-		moveq	#4-1,d7
+	move.l	d7,-(sp)
+	moveq	#4-1,d7
 @@:
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		move.b	d1,($0180,a3)
-		swap	d1
-		move.b	d1,($0080,a3)
-		ror.l	#8,d1
-		move.b	d1,($0000,a3)
-		swap	d1
-		move.b	d1,($0100,a3)
-		lea	($0200,a3),a3
-		dbra	d7,@b
-		lea	(-$80*16,a3),a3
-		move.l	(sp)+,d7
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	move.b	d1,($0180,a3)
+	swap	d1
+	move.b	d1,($0080,a3)
+	ror.l	#8,d1
+	move.b	d1,($0000,a3)
+	swap	d1
+	move.b	d1,($0100,a3)
+	lea	($0200,a3),a3
+	dbra	d7,@b
+	lea	(-$80*16,a3),a3
+	move.l	(sp)+,d7
 .endif
-		rts
+	rts
 
 *	半角文字パターンを強調＋反転表示する
 
 putc_bputbrv:
-		move.l	#$7f7f7f7f,d0
+	move.l	#$7f7f7f7f,d0
 .if UNROLL
-		i:=0
-		.rept	4
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		not.l	d1
-		move.b	d1,(i+$0180,a3)
-		swap	d1
-		move.b	d1,(i+$0080,a3)
-		ror.l	#8,d1
-		move.b	d1,(i+$0000,a3)
-		swap	d1
-		move.b	d1,(i+$0100,a3)
-		i:=i+$0200
-		.endm
+	i:=0
+	.rept	4
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	not.l	d1
+	move.b	d1,(i+$0180,a3)
+	swap	d1
+	move.b	d1,(i+$0080,a3)
+	ror.l	#8,d1
+	move.b	d1,(i+$0000,a3)
+	swap	d1
+	move.b	d1,(i+$0100,a3)
+	i:=i+$0200
+	.endm
 .else
-		move.l	d7,-(sp)
-		moveq	#4-1,d7
+	move.l	d7,-(sp)
+	moveq	#4-1,d7
 @@:
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		not.l	d1
-		move.b	d1,($0180,a3)
-		swap	d1
-		move.b	d1,($0080,a3)
-		ror.l	#8,d1
-		move.b	d1,($0000,a3)
-		swap	d1
-		move.b	d1,($0100,a3)
-		lea	($0200,a3),a3
-		dbra	d7,@b
-		lea	(-$80*16,a3),a3
-		move.l	(sp)+,d7
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	not.l	d1
+	move.b	d1,($0180,a3)
+	swap	d1
+	move.b	d1,($0080,a3)
+	ror.l	#8,d1
+	move.b	d1,($0000,a3)
+	swap	d1
+	move.b	d1,($0100,a3)
+	lea	($0200,a3),a3
+	dbra	d7,@b
+	lea	(-$80*16,a3),a3
+	move.l	(sp)+,d7
 .endif
-		rts
+	rts
 
 
 *---------------------------------------*
@@ -1167,12 +1167,12 @@ putc_hkanji:				*半角非漢字	<+07
 	cmpi.b	#$9f,d1
 	bcc	putc_kanji		*～$869e:半角非漢字 / $869f～:全角非漢字
 putc_hkanji1:
-		lea	(sjis2tbl,pc),a3
+	lea	(sjis2tbl,pc),a3
 .if CPU>=68020
-		move	(a3,d1.w*2),d1
+	move	(a3,d1.w*2),d1
 .else
-		add	d1,d1
-		move	(a3,d1.w),d1
+	add	d1,d1
+	move	(a3,d1.w),d1
 .endif
 	bmi	putc_undef		*未定義コード
 	adda	d1,a0
@@ -1218,13 +1218,13 @@ putc_knjAB:				*～$889e:非漢字   / $889f～:第１水準
 	bcs	putc_kanji
 	ext	d0
 .if CPU>=68020
-		lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
+	lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(FONTKNJ16B,pc),a0
-		movea.l	(-11*4,a0,d0.w),a0
-		lea	(-$0bc0,a0),a0
+	add	d0,d0
+	add	d0,d0
+	lea	(FONTKNJ16B,pc),a0
+	movea.l	(-11*4,a0,d0.w),a0
+	lea	(-$0bc0,a0),a0
 .endif
 	bra	putc_kanji
 
@@ -1282,12 +1282,12 @@ putc_knj88:				*～$889e:拡張外字 / $889f～:漢字
 	cmpi.b	#$9f,d1
 	bcs	putc_extk
 putc_kanji:				*全角漢字/非漢字
-		lea	(sjis2tbl,pc),a3
+	lea	(sjis2tbl,pc),a3
 .if CPU>=68020
-		move	(a3,d1.w*2),d1
+	move	(a3,d1.w*2),d1
 .else
-		add	d1,d1
-		move	(a3,d1.w),d1
+	add	d1,d1
+	move	(a3,d1.w),d1
 .endif
 	bmi.s	putc_undef		*未定義コード
 	adda	d1,a0
@@ -1309,16 +1309,16 @@ putc_wpat1:
 	add.l	(TXADR),d3		*ＶＲＡＭアドレス
 	movea.l	d3,a3
 	lea	(_CRTC21),a2
-		moveq	#$f,d0
-		and.b	(TXCOLOR),d0
-		move	(a2),d2
+	moveq	#$f,d0
+	and.b	(TXCOLOR),d0
+	move	(a2),d2
 .if CPU>=68020
-		jsr	(putc_wetbl,pc,d0.w*2)
+	jsr	(putc_wetbl,pc,d0.w*2)
 .else
-		add	d0,d0
-		lsr	#1,d3
-		bcs	putc_wpat5		*アドレスが奇数の場合
-		jsr	(putc_wetbl,pc,d0.w)	*色コード別の文字表示ルーチンを呼ぶ(偶数)
+	add	d0,d0
+	lsr	#1,d3
+	bcs	putc_wpat5		*アドレスが奇数の場合
+	jsr	(putc_wetbl,pc,d0.w)	*色コード別の文字表示ルーチンを呼ぶ(偶数)
 .endif
 	move	d2,(a2)
 	addq	#2,(CSRX)
@@ -1422,149 +1422,149 @@ putc_wecol3:
 
 putc_weputpat:
 .if UNROLL
-		i:=0
-		.rept	16
-		move	(a0)+,(i,a3)
-		i:=i+$0080
-		.endm
+	i:=0
+	.rept	16
+	move	(a0)+,(i,a3)
+	i:=i+$0080
+	.endm
 .else
-		moveq	#$80-2,d1
-		moveq	#16/2-1,d3
+	moveq	#$80-2,d1
+	moveq	#16/2-1,d3
 @@:
-		.rept	2
-		move	(a0)+,(a3)+
-		adda.l	d1,a3
-		.endm
-		dbra	d3,@b
-		lea	(-$80*16,a3),a3
+	.rept	2
+	move	(a0)+,(a3)+
+	adda.l	d1,a3
+	.endm
+	dbra	d3,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	全角１文字分をクリアする(偶数)
 
 putc_weclrpat:
-		moveq	#0,d0
+	moveq	#0,d0
 .if UNROLL
-		i:=0
-		.rept	16
-		move	d0,(i,a3)
-		i:=i+$0080
-		.endm
+	i:=0
+	.rept	16
+	move	d0,(i,a3)
+	i:=i+$0080
+	.endm
 .else
-		moveq	#$80-2,d1
-		moveq	#16/2-1,d3
+	moveq	#$80-2,d1
+	moveq	#16/2-1,d3
 @@:
-		.rept	2
-		move	d0,(a3)+
-		adda.l	d1,a3
-		.endm
-		dbra	d3,@b
-		lea	(-$80*16,a3),a3
+	.rept	2
+	move	d0,(a3)+
+	adda.l	d1,a3
+	.endm
+	dbra	d3,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	全角文字パターンを反転表示する(偶数)
 
 putc_weputrev:
 .if UNROLL
-		i:=0
-		.rept	8
-		move.l	(a0)+,d0
-		not.l	d0
-		move	d0,(i+$0080,a3)
-		swap	d0
-		move	d0,(i+$0000,a3)
-		i:=i+$0100
-		.endm
+	i:=0
+	.rept	8
+	move.l	(a0)+,d0
+	not.l	d0
+	move	d0,(i+$0080,a3)
+	swap	d0
+	move	d0,(i+$0000,a3)
+	i:=i+$0100
+	.endm
 .else
-		moveq	#$0100>>8,d1
-		lsl	#8,d1
-		moveq	#8-1,d3
+	moveq	#$0100>>8,d1
+	lsl	#8,d1
+	moveq	#8-1,d3
 @@:
-		move.l	(a0)+,d0
-		not.l	d0
-		move	d0,($0080,a3)
-		swap	d0
-		move	d0,($0000,a3)
-		adda.l	d1,a3
-		dbra	d3,@b
-		lea	(-$80*16,a3),a3
+	move.l	(a0)+,d0
+	not.l	d0
+	move	d0,($0080,a3)
+	swap	d0
+	move	d0,($0000,a3)
+	adda.l	d1,a3
+	dbra	d3,@b
+	lea	(-$80*16,a3),a3
 .endif
-		rts
+	rts
 
 *	全角文字パターンを強調表示する(偶数)
 
 putc_weputbld:
-		move.l	#$7fff7fff,d0
+	move.l	#$7fff7fff,d0
 .if UNROLL
-		i:=0
-		.rept	8
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		move	d1,(i+$0080,a3)
-		swap	d1
-		move	d1,(i+$0000,a3)
-		i:=i+$0100
-		.endm
+	i:=0
+	.rept	8
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	move	d1,(i+$0080,a3)
+	swap	d1
+	move	d1,(i+$0000,a3)
+	i:=i+$0100
+	.endm
 .else
-		move.l	d7,-(sp)
-		moveq	#8-1,d7
+	move.l	d7,-(sp)
+	moveq	#8-1,d7
 @@:
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		move	d1,($0080,a3)
-		swap	d1
-		move	d1,($0000,a3)
-		lea	($0100,a3),a3
-		dbra	d7,@b
-		lea	(-$80*16,a3),a3
-		move.l	(sp)+,d7
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	move	d1,($0080,a3)
+	swap	d1
+	move	d1,($0000,a3)
+	lea	($0100,a3),a3
+	dbra	d7,@b
+	lea	(-$80*16,a3),a3
+	move.l	(sp)+,d7
 .endif
-		rts
+	rts
 
 *	全角文字パターンを強調＋反転表示する(偶数)
 
 putc_weputbrv:
-		move.l	#$7fff7fff,d0
+	move.l	#$7fff7fff,d0
 .if UNROLL
-		i:=0
-		.rept	8
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		not.l	d1
-		move	d1,(i+$0080,a3)
-		swap	d1
-		move	d1,(i+$0000,a3)
-		i:=i+$0100
-		.endm
+	i:=0
+	.rept	8
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	not.l	d1
+	move	d1,(i+$0080,a3)
+	swap	d1
+	move	d1,(i+$0000,a3)
+	i:=i+$0100
+	.endm
 .else
-		move.l	d7,-(sp)
-		moveq	#8-1,d7
+	move.l	d7,-(sp)
+	moveq	#8-1,d7
 @@:
-		move.l	(a0)+,d1
-		move.l	d1,d3
-		lsr.l	#1,d1
-		and.l	d0,d1
-		or.l	d3,d1
-		not.l	d1
-		move	d1,($0080,a3)
-		swap	d1
-		move	d1,($0000,a3)
-		lea	($0100,a3),a3
-		dbra	d7,@b
-		lea	(-$80*16,a3),a3
-		move.l	(sp)+,d7
+	move.l	(a0)+,d1
+	move.l	d1,d3
+	lsr.l	#1,d1
+	and.l	d0,d1
+	or.l	d3,d1
+	not.l	d1
+	move	d1,($0080,a3)
+	swap	d1
+	move	d1,($0000,a3)
+	lea	($0100,a3),a3
+	dbra	d7,@b
+	lea	(-$80*16,a3),a3
+	move.l	(sp)+,d7
 .endif
-		rts
+	rts
 
 
 
@@ -1657,7 +1657,7 @@ putc_wocol3:
 	move	#$0133,(a2)		*プレーン0,1同時アクセス
 
 
-		.fail	UNROLL.eq.0
+	.fail	UNROLL.eq.0
 
 *	全角文字パターンを転送する(奇数)
 
@@ -1762,12 +1762,12 @@ chr_adr::
 *	d2.w=0～5	外字フォントアドレスの変更
 
 .if CPU>=68020
-		lea	(USKFONT0,d0.w*4),a0
+	lea	(USKFONT0,d0.w*4),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(USKFONT0),a0
-		adda	d0,a0
+	add	d0,d0
+	add	d0,d0
+	lea	(USKFONT0),a0
+	adda	d0,a0
 .endif
 	move.l	(a0),d0			*変更前のフォントアドレス
 	tst.b	d3
@@ -1789,12 +1789,12 @@ chr_adr10:
 	cmpi	#7,d0
 	bcc	chr_adr20
 .if CPU>=68020
-		lea	(FONTANK6.w,pc,d0.w*4),a0
+	lea	(FONTANK6.w,pc,d0.w*4),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(FONTANK6,pc),a0
-		adda	d0,a0
+	add	d0,d0
+	add	d0,d0
+	lea	(FONTANK6,pc),a0
+	adda	d0,a0
 .endif
 	move.l	(a0),d0			*変更前のフォントアドレス
 	tst.b	d3
@@ -1818,12 +1818,12 @@ chr_adr20:
 	cmpi	#3,d0
 	bcc	chr_adr21
 .if CPU>=68020
-		lea	(FONTKNJ16A.w,pc,d0.w*4),a0
+	lea	(FONTKNJ16A.w,pc,d0.w*4),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(FONTKNJ16A,pc),a0
-		adda	d0,a0
+	add	d0,d0
+	add	d0,d0
+	lea	(FONTKNJ16A,pc),a0
+	adda	d0,a0
 .endif
 	move.l	(a0),d0			*変更前のフォントアドレス
 	tst.b	d3
@@ -2064,10 +2064,10 @@ fntget1:
 *****************************************
 
 fntadr::
-		cmpi.b	#12,d2
-		beq	fntadr24		;12×24,24×24ドットフォント
+	cmpi.b	#12,d2
+	beq	fntadr24		;12×24,24×24ドットフォント
 
-		move.b	d2,-(sp)		;!!!
+	move.b	d2,-(sp)		;!!!
 
 	cmpi	#$2000,d1		*?? ($0000～$1fffは半角)
 	bcs	fntadr_ank		*半角１バイト文字
@@ -2157,13 +2157,13 @@ fntadr_hkanji:				*半角非漢字	<+07
 	bcc	fntadr_kanji		*～$869e:半角非漢字 / $869f～:全角非漢字
 fntadr_hkanji1:
 .if CPU>=68020
-		move	(sjis2tbl,pc,d1.w*2),d1
+	move	(sjis2tbl,pc,d1.w*2),d1
 .else
-		add	d1,d1
-		move.l	a1,-(sp)
-		lea	(sjis2tbl,pc),a1
-		move	(a1,d1.w),d1
-		movea.l	(sp)+,a1
+	add	d1,d1
+	move.l	a1,-(sp)
+	lea	(sjis2tbl,pc),a1
+	move	(a1,d1.w),d1
+	movea.l	(sp)+,a1
 .endif
 	bmi	fntadr_undef		*未定義コード
 	adda	d1,a0
@@ -2204,8 +2204,8 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 	andi	#$00ff,d1
 	ext.l	d1
 
-		subq.b	#6,(sp)+
-		beq	@f
+	subq.b	#6,(sp)+
+	beq	@f
 
 	lsl	#4,d1
 	add.l	(FONTANK8,pc),d1	;8x16
@@ -2227,98 +2227,100 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 
 
 fntadr_ank8:
-		subq.b	#6,(sp)+
-		beq	fntadr6m
+	subq.b	#6,(sp)+
+	beq	fntadr6m
 
-		moveq	#8,d1			;#8<<16|1-1
-		swap	d1
-		moveq	#16-1,d2
-		rts
+	moveq	#8,d1			;#8<<16|1-1
+	swap	d1
+	moveq	#16-1,d2
+	rts
 
 
 ;8x16ドットフォントを6x12ドットフォントに縮小する
 fntadr6m:
-		move.l	a1,-(sp)
-		move.l	d0,a0			;8x16
-		lea	(MKFONTBUF),a1
+	move.l	a1,-(sp)
+	move.l	d0,a0			;8x16
+	lea	(MKFONTBUF),a1
 
-		moveq	#0,d1
-		move	#%101101101101_0000,d2
-fntadr6m_loop:	bmi	@f
-		move.b	(a0)+,d1
-		or.b	(a0)+,d1
-		bra	1f
-@@:		move.b	(a0)+,d1
+	moveq	#0,d1
+	move	#%101101101101_0000,d2
+fntadr6m_loop:
+	bmi	@f
+	move.b	(a0)+,d1
+	or.b	(a0)+,d1
+	bra	1f
+@@:	move.b	(a0)+,d1
 1:
-		moveq	#%0000_1111,d0
-		and.b	d1,d0
-		lsr.b	#4,d1
-		move.b	(fntadr6m_low ,pc,d0.w),d0
-		or.b	(fntadr6m_high,pc,d1.w),d0
-		move.b	d0,(a1)+
-		add	d2,d2
-		bne	fntadr6m_loop
+	moveq	#%0000_1111,d0
+	and.b	d1,d0
+	lsr.b	#4,d1
+	move.b	(fntadr6m_low ,pc,d0.w),d0
+	or.b	(fntadr6m_high,pc,d1.w),d0
+	move.b	d0,(a1)+
+	add	d2,d2
+	bne	fntadr6m_loop
 
-		movea.l	(sp)+,a1
-		move	#MKFONTBUF,d0
-		moveq	#6,d1			;#6<<16|1-1
-		swap	d1
-		moveq	#12-1,d2
-		rts
+	movea.l	(sp)+,a1
+	move	#MKFONTBUF,d0
+	moveq	#6,d1			;#6<<16|1-1
+	swap	d1
+	moveq	#12-1,d2
+	rts
 
-P8TO6:		.macro	shift
-i:=0
+P8TO6:	.macro	shift
+	i:=0
 	.rept	16
-		.dc.b	(((i>>3).and.1)<<2+(((i>>2).or.(i>>1)).and.1)<<1+(i.and.1))<<shift
-		i:=i+1
+	.dc.b	(((i>>3).and.1)<<2+(((i>>2).or.(i>>1)).and.1)<<1+(i.and.1))<<shift
+	i:=i+1
 	.endm
-		.endm
+	.endm
 
 fntadr6m_high:	P8TO6	5			;%1110_0000
 fntadr6m_low:	P8TO6	2			;%0001_1100
 fntadr12m_tbl:	P8TO6	4			;%0111_0000
-		.even
+	.even
 
 ;16x16ドットフォントを12x12ドットフォントに縮小する
 fntadr12m:
-		movem.l	d3-d4/a1,-(sp)
-		movea.l	d0,a0			;16x16
-		lea	(MKFONTBUF),a1
-		move.l	a1,d0
+	movem.l	d3-d4/a1,-(sp)
+	movea.l	d0,a0			;16x16
+	lea	(MKFONTBUF),a1
+	move.l	a1,d0
 
-		move	#%101101101101_0000,d2
-fntadr12m_loop:	bmi	@f
-		move	(a0)+,d1
-		or	(a0)+,d1
-		bra	1f
-@@:		move	(a0)+,d1
+	move	#%101101101101_0000,d2
+fntadr12m_loop:
+	bmi	@f
+	move	(a0)+,d1
+	or	(a0)+,d1
+	bra	1f
+@@:	move	(a0)+,d1
 1:
-		moveq	#%1111,d4
-		and	d1,d4
-		move.b	(fntadr12m_tbl,pc,d4.w),d4
-		lsr	#4,d1
-		moveq	#%1111,d3
-		and	d1,d3
-		move.b	(fntadr6m_high,pc,d3.w),d3	;move.b	(fntadr12m_table,pc,d3.w),d3
-		add	d3,d3				;lsl	#3,d3
-		add	d3,d3				;
-		or	d3,d4
-		lsr	#4,d1
-		moveq	#%1111,d3
-		and	d1,d3
-		lsr	#4,d1
-		move.b	(fntadr6m_low ,pc,d3.w),d3
-		or.b	(fntadr6m_high,pc,d1.w),d3
-		lsl	#8,d3
-		or	d3,d4
-		move	d4,(a1)+
-		add	d2,d2
-		bne	fntadr12m_loop
+	moveq	#%1111,d4
+	and	d1,d4
+	move.b	(fntadr12m_tbl,pc,d4.w),d4
+	lsr	#4,d1
+	moveq	#%1111,d3
+	and	d1,d3
+	move.b	(fntadr6m_high,pc,d3.w),d3	;move.b	(fntadr12m_table,pc,d3.w),d3
+	add	d3,d3				;lsl	#3,d3
+	add	d3,d3				;
+	or	d3,d4
+	lsr	#4,d1
+	moveq	#%1111,d3
+	and	d1,d3
+	lsr	#4,d1
+	move.b	(fntadr6m_low ,pc,d3.w),d3
+	or.b	(fntadr6m_high,pc,d1.w),d3
+	lsl	#8,d3
+	or	d3,d4
+	move	d4,(a1)+
+	add	d2,d2
+	bne	fntadr12m_loop
 
-		movem.l	(sp)+,d3-d4/a1
-		move.l	#12<<16|2-1,d1		;12×12ドットフォント
-		moveq	#12-1,d2
-		rts
+	movem.l	(sp)+,d3-d4/a1
+	move.l	#12<<16|2-1,d1		;12×12ドットフォント
+	moveq	#12-1,d2
+	rts
 
 
 fntadr_knjAB:				*～$889e:非漢字   / $889f～:第１水準
@@ -2326,13 +2328,13 @@ fntadr_knjAB:				*～$889e:非漢字   / $889f～:第１水準
 	bcs	fntadr_kanji
 	ext	d0
 .if CPU>=68020
-		lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
+	lea	([(FONTKNJ16B-11*4).w,pc,d0.w*4],-$0bc0),a0
 .else
-		add	d0,d0
-		add	d0,d0
-		lea	(FONTKNJ16B,pc),a0
-		movea.l	(-11*4,a0,d0.w),a0
-		lea	(-$0bc0,a0),a0
+	add	d0,d0
+	add	d0,d0
+	lea	(FONTKNJ16B,pc),a0
+	movea.l	(-11*4,a0,d0.w),a0
+	lea	(-$0bc0,a0),a0
 .endif
 	bra	fntadr_kanji
 
@@ -2371,12 +2373,12 @@ fntadr_kanji:				*全角漢字/非漢字
 	adda	d1,a0
 	move.l	a0,d0
 fntadr_kanji16:
-		subq.b	#6,(sp)+
-		beq	fntadr12m
+	subq.b	#6,(sp)+
+	beq	fntadr12m
 
-		move.l	#16<<16|2-1,d1		;16×16ドットフォント
-		moveq	#16-1,d2
-		rts
+	move.l	#16<<16|2-1,d1		;16×16ドットフォント
+	moveq	#16-1,d2
+	rts
 
 
 *	シフトＪＩＳコード２バイト目のオフセットテーブル
@@ -2612,72 +2614,72 @@ putc_bel:				*07:BEL
 	bls	putc_bel0
 	bsr	putc_crlf		*カーソルが画面右端を越えている
 putc_bel0:
-		move.l	(EXBEEPVEC),d0
-		beq	@f
+	move.l	(EXBEEPVEC),d0
+	beq	@f
 
-		move.l	d0,-(sp)	;登録された拡張処理を呼び出す
-		rts
+	move.l	d0,-(sp)		;登録された拡張処理を呼び出す
+	rts
 @@:
-		move.b	(VBELLFLG,pc),d0
-		bne	putc_bel1	*ビジュアルベルの場合
+	move.b	(VBELLFLG,pc),d0
+	bne	putc_bel1		*ビジュアルベルの場合
 
-		moveq	#0,d2
-		move	(BEEPLEN),d2
-		beq	putc_nul9	*ビープ音データがない
+	moveq	#0,d2
+	move	(BEEPLEN),d2
+	beq	putc_nul9		*ビープ音データがない
 
-		move.l	a1,-(sp)
-		movea.l	(BEEPADR),a1
-		move	#$0403,d1	*15.6KHz 左右
-		moveq	#0,d0
-		movea.l	(_ADPCMOUT*4+$400),a0
-		jsr	(a0)		*PCMでビープ音を鳴らす
-		move.l	(sp)+,a1
-		rts
+	move.l	a1,-(sp)
+	movea.l	(BEEPADR),a1
+	move	#$0403,d1		*15.6KHz 左右
+	moveq	#0,d0
+	movea.l	(_ADPCMOUT*4+$400),a0
+	jsr	(a0)			*PCMでビープ音を鳴らす
+	move.l	(sp)+,a1
+	rts
 putc_bel1:
-		lea	(_MFP_GPIP),a2
-		moveq	#4-1,d0
+	lea	(_MFP_GPIP),a2
+	moveq	#4-1,d0
 
-		lea	(_TEXTPAL),a0
-		movem.l	(a0),d1-d2
-		cmp.l	(10*2,a0),d2
-		bne	putc_bel2
-		cmp	(9*2,a0),d1
-		bne	putc_bel2
-		cmpi	#1,(8*2,a0)
-		beq	putc_bel_gm
+	lea	(_TEXTPAL),a0
+	movem.l	(a0),d1-d2
+	cmp.l	(10*2,a0),d2
+	bne	putc_bel2
+	cmp	(9*2,a0),d1
+	bne	putc_bel2
+	cmpi	#1,(8*2,a0)
+	beq	putc_bel_gm
 putc_bel2:
-		btst	#4,(a2)
-		beq	putc_bel2	*垂直表示期間まで待つ
+	btst	#4,(a2)
+	beq	putc_bel2		*垂直表示期間まで待つ
 putc_bel3:
-		btst	#4,(a2)
-		bne	putc_bel3	*垂直帰線期間まで待つ
+	btst	#4,(a2)
+	bne	putc_bel3		*垂直帰線期間まで待つ
 
-		swap	d1
-		swap	d2
-		exg	d1,d2
-		movem.l	d1-d2,(a0)	*テキストパレットを反転する
-		dbra	d0,putc_bel2
-		rts
+	swap	d1
+	swap	d2
+	exg	d1,d2
+	movem.l	d1-d2,(a0)		*テキストパレットを反転する
+	dbra	d0,putc_bel2
+	rts
 putc_bel_gm:
-@@:		btst	#4,(a2)
-		beq	@b
-@@:		btst	#4,(a2)
-		bne	@b
+@@:	btst	#4,(a2)
+	beq	@b
+@@:	btst	#4,(a2)
+	bne	@b
 
-		movem.l	(a0),d1-d2
-		swap	d1
-		swap	d2
-		exg	d1,d2
-		movem.l	d1-d2,(a0)	*テキストパレットを反転する
+	movem.l	(a0),d1-d2
+	swap	d1
+	swap	d2
+	exg	d1,d2
+	movem.l	d1-d2,(a0)		*テキストパレットを反転する
 
-		movem.l	(8*2,a0),d1-d2
-		swap	d1
-		swap	d2
-		exg	d1,d2
-		movem.l	d1-d2,(8*2,a0)
+	movem.l	(8*2,a0),d1-d2
+	swap	d1
+	swap	d2
+	exg	d1,d2
+	movem.l	d1-d2,(8*2,a0)
 
-		dbra	d0,putc_bel_gm
-		rts
+	dbra	d0,putc_bel_gm
+	rts
 
 putc_bs:				*08:BS
 	subq	#1,(CSRX)
@@ -2793,10 +2795,10 @@ putc_eral3:
 	move.b	(sp)+,d1		;move.b	d2,d1
 	addq.b	#1,d1			*転送先ラスター
 .if CPU>=68020
-		lsl	#2,d0
+	lsl	#2,d0
 .else
-		add	d0,d0
-		add	d0,d0
+	add	d0,d0
+	add	d0,d0
 .endif
 	subq	#1,d0			*転送ラスター数
 	move	#$0101,d2
@@ -2837,20 +2839,20 @@ putc_erals0:
 	beq	putc_erals1
 	subq	#1,d2
 putc_erals1:
-		moveq	#3,d4
-		and	d2,d4		*バイト数を４で割った余り
+	moveq	#3,d4
+	and	d2,d4			*バイト数を４で割った余り
 	lsr	#2,d2			*バイト数／４
 	neg	d4
 	neg	d2
 .if CPU>=68020
-		lea	(putc_eralsdo4,pc,d2.w*2),a1
-		lea	(putc_eralsdo3,pc,d4.w*2),a2
+	lea	(putc_eralsdo4,pc,d2.w*2),a1
+	lea	(putc_eralsdo3,pc,d4.w*2),a2
 .else
-		add	d2,d2
-		lea	(putc_eralsdo4,pc),a1
-		adda	d2,a1
-		add	d4,d4
-		lea	(putc_eralsdo3,pc,d4.w),a2
+	add	d2,d2
+	lea	(putc_eralsdo4,pc),a1
+	adda	d2,a1
+	add	d4,d4
+	lea	(putc_eralsdo3,pc,d4.w),a2
 .endif
 	lea	(_CRTC21),a3
 	bset	#0,(a3)			*テキストＶＲＡＭ同時アクセス
@@ -2976,18 +2978,18 @@ putc_rollup:
 	move.b	d1,d0			*スクロール開始ラスター	(転送先)
 	addq	#4,d1			*			(転送元)
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	d0,d1
 	move	(CSRYMAX),d0
 .if CPU>=68020
-		lsl	#2,d0
+	lsl	#2,d0
 .else
-		add	d0,d0
-		add	d0,d0		*スクロールラスター数
+	add	d0,d0
+	add	d0,d0			*スクロールラスター数
 .endif
 	move	#$0101,d2
 	bsr	putc_rascpy		*スクロールアップ
@@ -3008,20 +3010,20 @@ putc_rolldw:
 	rol.l	#7,d1
 	move	(CSRYMAX),d0
 .if CPU>=68020
-		lsl	#2,d0
+	lsl	#2,d0
 .else
-		add	d0,d0
-		add	d0,d0		*スクロールラスター数
+	add	d0,d0
+	add	d0,d0			*スクロールラスター数
 .endif
 	add.b	d0,d1
 	addq.b	#3,d1
 	move.b	d1,d2			*スクロール開始ラスター	(転送先)
 	subq	#4,d1			*			(転送元)
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	d2,d1
 	move	#$feff,d2
@@ -3101,20 +3103,20 @@ putc_sftrdo:
 	bcc	putc_sftrdo1
 	subq	#1,d3			*ＶＲＡＭアドレスが偶数
 putc_sftrdo1:
-		moveq	#3,d1
-		and	d3,d1		*バイト数を４で割った余り
+	moveq	#3,d1
+	and	d3,d1			*バイト数を４で割った余り
 	lsr	#2,d3			*バイト数／４
 	neg	d1
 	neg	d3
 .if CPU>=68020
-		lea	(putc_sftrdo5,pc,d3.w*2),a5
-		lea	(putc_sftrdo4,pc,d1.w*2),a0
+	lea	(putc_sftrdo5,pc,d3.w*2),a5
+	lea	(putc_sftrdo4,pc,d1.w*2),a0
 .else
-		add	d3,d3
-		lea	(putc_sftrdo5,pc),a5
-		adda	d3,a5
-		add	d1,d1
-		lea	(putc_sftrdo4,pc,d1.w),a0
+	add	d3,d3
+	lea	(putc_sftrdo5,pc),a5
+	adda	d3,a5
+	add	d1,d1
+	lea	(putc_sftrdo4,pc,d1.w),a0
 .endif
 putc_sftrdo2:
 	tst.b	d0
@@ -3159,10 +3161,10 @@ putc_smtrup:
 	move.l	d0,d1			*スクロール開始ラスター (転送先)
 	add	(4,a1),d1		*			(転送元)
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	d0,d1
 	move	(CSRYMAX),d0
@@ -3200,109 +3202,110 @@ putc_smtdata:				*スムーススクロール用データ
 *---------------------------------------*
 
 putc_escsq:
-		movem.l	d4/a1/a4-a5,-(sp)
-		movea.l	(ESCSQPTR),a1
-		move.b	d1,(a1)+	*ESCシーケンスを保存する
-		lea	(ESCSQBUF+9),a0
-		cmpa.l	a0,a1
-		beq	putc_escsq1
+	movem.l	d4/a1/a4-a5,-(sp)
+	movea.l	(ESCSQPTR),a1
+	move.b	d1,(a1)+		*ESCシーケンスを保存する
+	lea	(ESCSQBUF+9),a0
+	cmpa.l	a0,a1
+	beq	putc_escsq1
 
-		move.l	a1,(ESCSQPTR)
+	move.l	a1,(ESCSQPTR)
 putc_escsq1:
-		move.b	(ESCSQBUF),d0
-		cmpi.b	#'[',d0
-		beq	putc_esc10
-		cmpi.b	#'=',d0
-		beq	putc_esc20
-		cmpi.b	#'*',d0
-		beq	putc_esc30
-		cmpi.b	#'D',d0
-		beq	putc_esc40
-		cmpi.b	#'E',d0
-		beq	putc_esc50
-		cmpi.b	#'M',d0
-		beq	putc_esc60
+	move.b	(ESCSQBUF),d0
+	cmpi.b	#'[',d0
+	beq	putc_esc10
+	cmpi.b	#'=',d0
+	beq	putc_esc20
+	cmpi.b	#'*',d0
+	beq	putc_esc30
+	cmpi.b	#'D',d0
+	beq	putc_esc40
+	cmpi.b	#'E',d0
+	beq	putc_esc50
+	cmpi.b	#'M',d0
+	beq	putc_esc60
 
-		move.b	(CONESCFLG,pc),d4
-putc_escsq0::	bra	putc_escsq8		;condrv 常駐時は hiocs.s から
-**		bne	putc_escsq8		;bne に書き換えられる
+	move.b	(CONESCFLG,pc),d4
+putc_escsq0::
+	bra	putc_escsq8		;condrv 常駐時は hiocs.s から
+**	bne	putc_escsq8		;bne に書き換えられる
 
-		movea.l	(LOGBUFVECT,pc),a2
-		subi.b	#'0',d0			;CONDRV.SYS対応処理
-		subq.b	#1,d0
-		bhi	putc_escsq02		;2->1 3->2
-		beq	putc_escsq01
+	movea.l	(LOGBUFVECT,pc),a2
+	subi.b	#'0',d0			;CONDRV.SYS対応処理
+	subq.b	#1,d0
+	bhi	putc_escsq02		;2->1 3->2
+	beq	putc_escsq01
 
 * condrv のシステムコール $24 を使用する方法.
 * 従来と互換性がないが、ネストが可能(ESC 0 の状態
 * で ESC 0 ESC 1 を処理すると ESC 0 の状態に戻る).
 * ただしキーボードから制御できないので、ESC 0 と
 * ESC 1 を組で使用しなければ面倒なことになる.
-		move.l	d1,-(sp)
-		moveq	#+1,d1			;ESC 0	バックログ記録禁止
-		bra	@f
+	move.l	d1,-(sp)
+	moveq	#+1,d1			;ESC 0	バックログ記録禁止
+	bra	@f
 putc_escsq01:
-		move.l	d1,-(sp)
-		moveq	#-1,d1			;ESC 1	バックログ記録許可
+	move.l	d1,-(sp)
+	moveq	#-1,d1			;ESC 1	バックログ記録許可
 @@:
-		movea.l	(CONDSYSCALL,pc),a2
-		moveq	#$24,d0			;バッファリング制御II
-		jsr	(a2)			;システムコールを呼び出す
-		move.l	(sp)+,d1
-		bra	putc_escsq8
+	movea.l	(CONDSYSCALL,pc),a2
+	moveq	#$24,d0			;バッファリング制御II
+	jsr	(a2)			;システムコールを呼び出す
+	move.l	(sp)+,d1
+	bra	putc_escsq8
 
 putc_escsq02:
-		subq.b	#2,d0
-		beq	putc_escsq03
-		bhi	putc_escsq8
+	subq.b	#2,d0
+	beq	putc_escsq03
+	bhi	putc_escsq8
 ;ESC 2
-		cmpi	#MOVEM,(a2)
-		beq	@f			;!>が表示されていないならそのまま
+	cmpi	#MOVEM,(a2)
+	beq	@f			;!>が表示されていないならそのまま
 
-		move	#MOVEM,(a2)
-		bsr	clear_mpu_cache
-		bsr	redraw_system_status	;!>を強制的に消す
-		move	#RTS,(a2)
-		bsr	clear_mpu_cache
+	move	#MOVEM,(a2)
+	bsr	clear_mpu_cache
+	bsr	redraw_system_status	;!>を強制的に消す
+	move	#RTS,(a2)
+	bsr	clear_mpu_cache
 @@:
-		movea.l	(CONDFLAG,pc),a2
-		bset	#0,(a2)			;ESC 2  ステータス表示禁止
-		bra	putc_escsq8
+	movea.l	(CONDFLAG,pc),a2
+	bset	#0,(a2)			;ESC 2  ステータス表示禁止
+	bra	putc_escsq8
 putc_escsq03:
-		movea.l	(CONDFLAG,pc),a2
-		bclr	#0,(a2)			;ESC 3  ステータス表示許可
+	movea.l	(CONDFLAG,pc),a2
+	bclr	#0,(a2)			;ESC 3  ステータス表示許可
 putc_escsq04:
-		bsr	redraw_system_status
-		bra	putc_escsq8
+	bsr	redraw_system_status
+	bra	putc_escsq8
 
 redraw_system_status:
-		move.l	#$000e_ffff,-(sp)
-		DOS	_CONCTRL		;ファンクションキー表示
-		addq.l	#4,sp
-		rts
+	move.l	#$000e_ffff,-(sp)
+	DOS	_CONCTRL		;ファンクションキー表示
+	addq.l	#4,sp
+	rts
 
 clear_mpu_cache::
-		cmpi.b	#1,(MPUTYPE)
-		bls	@f
-		move.l	d1,-(sp)
-		moveq	#3,d1
-		IOCS	_SYS_STAT
-		move.l	(sp)+,d1
-@@:		rts
+	cmpi.b	#1,(MPUTYPE)
+	bls	@f
+	move.l	d1,-(sp)
+	moveq	#3,d1
+	IOCS	_SYS_STAT
+	move.l	(sp)+,d1
+@@:	rts
 
 putc_esc10:				*ESC [
-		moveq	#$20,d0
-		or.b	d1,d0
-		subi.b	    #($20.or.'@'),d0
-		cmpi.b	#'z'-($20.or.'@'),d0
-		bhi	putc_escsq9	*英文字でない
+	moveq	#$20,d0
+	or.b	d1,d0
+	subi.b	    #($20.or.'@'),d0
+	cmpi.b	#'z'-($20.or.'@'),d0
+	bhi	putc_escsq9	*英文字でない
 
-		bsr	putc_escex
+	bsr	putc_escex
 putc_escsq8:
-		clr.b	(FIRSTBYTE)
+	clr.b	(FIRSTBYTE)
 putc_escsq9:
-		movem.l	(sp)+,d4/a1/a4-a5
-		rts
+	movem.l	(sp)+,d4/a1/a4-a5
+	rts
 
 
 putc_esc40:				*ESC D	カーソル下移動
@@ -3379,11 +3382,11 @@ putc_escex16:
 	rts
 
 putc_escex:				*ESC [ に続くコードの処理
-		move.l	(ESCSUBSTVEC),d0
-		beq	@f
+	move.l	(ESCSUBSTVEC),d0
+	beq	@f
 
-		move.l	d0,-(sp)	;登録された拡張処理を呼び出す
-		rts
+	move.l	d0,-(sp)		;登録された拡張処理を呼び出す
+	rts
 @@:
 	lea	(ESCSQBUF),a0
 	move.l	(a0),d0
@@ -3860,10 +3863,10 @@ putc_ins1:
 	move	d3,d1			*CSRYMAX
 	addq	#1,d1
 .if CPU>=68020
-		lsl	#2,d1
+	lsl	#2,d1
 .else
-		add	d1,d1
-		add	d1,d1		*４倍
+	add	d1,d1
+	add	d1,d1			*４倍
 .endif
 	subq	#1,d1
 	add	d1,d0			*スクロール開始ラスター (転送先)
@@ -3873,10 +3876,10 @@ putc_ins1:
 	sub	d4,d1
 	sub	d4,d1			*			(転送元)
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	d0,d1
 	move	d3,d0
@@ -3955,10 +3958,10 @@ putc_del1:
 	rol.l	#7,d0
 	move	d2,d1
 .if CPU>=68020
-		lsl	#2,d1
+	lsl	#2,d1
 .else
-		add	d1,d1
-		add	d1,d1		*４倍
+	add	d1,d1
+	add	d1,d1			*４倍
 .endif
 	add	d1,d0			*スクロール開始ラスター (転送先)
 	move.l	d0,d1
@@ -3967,10 +3970,10 @@ putc_del1:
 	add	d4,d1
 	add	d4,d1			*			(転送元)
 .if CPU>=68020
-		lsl	#8,d1
+	lsl	#8,d1
 .else
-		move.b	d1,-(sp)
-		move	(sp)+,d1
+	move.b	d1,-(sp)
+	move	(sp)+,d1
 .endif
 	move.b	d0,d1
 	move	d3,d0
@@ -4254,51 +4257,51 @@ b_conmod9:
 *	d1.w=17 ラスタコピースクロールモード指定
 
 b_conmod0:
-		clr	(SCROLLMOD)
-		bra	b_conmod9
+	clr	(SCROLLMOD)
+	bra	b_conmod9
 
 *	d1.w=18 ソフトコピースクロールモード指定
 
 b_conmod1:
-		move	#-1,(SCROLLMOD)
-		bra	b_conmod9
+	move	#-1,(SCROLLMOD)
+	bra	b_conmod9
 
 *	d1.w=16	スムーススクロール指定
 
 b_conmod2:
-		moveq	#3,d0
-		and	d2,d0
-		move.b	(smtscroll_table,pc,d0.w),d0
-		move	d0,(SMTSCROLL)
-		bra	b_conmod9
+	moveq	#3,d0
+	and	d2,d0
+	move.b	(smtscroll_table,pc,d0.w),d0
+	move	d0,(SMTSCROLL)
+	bra	b_conmod9
 smtscroll_table:
-		.dc.b	0,4,8,16
-		.even
+	.dc.b	0,4,8,16
+	.even
 
 *	d1.w=0	カーソル点滅をする
 
 b_conmod3:
-		clr	(CSRWINKSW)
-		bra	b_conmod9
+	clr	(CSRWINKSW)
+	bra	b_conmod9
 
 *	d1.w=1	カーソル点滅を禁止
 
 b_conmod4:
-		move	#-1,(CSRWINKSW)
-		bra	b_conmod9
+	move	#-1,(CSRWINKSW)
+	bra	b_conmod9
 
 *	d1.w=2	カーソルパターンを指定
 
 b_conmod5:
-		move	d2,(CSRLPAT)	*カーソルパターン
-		move.l	d2,d0
-		swap	d0
-		andi	#$000f,d0	*カーソル描画開始ライン
-		lsl	#2,d0
-		move	d0,(CSRDRLINE)
-		lea	(CSRPATSW,pc),a0
-		sf	(a0)
-		bra	b_conmod9
+	move	d2,(CSRLPAT)		*カーソルパターン
+	move.l	d2,d0
+	swap	d0
+	andi	#$000f,d0		*カーソル描画開始ライン
+	lsl	#2,d0
+	move	d0,(CSRDRLINE)
+	lea	(CSRPATSW,pc),a0
+	sf	(a0)
+	bra	b_conmod9
 
 *	d1.w=3	カーソルパターンを定義
 
@@ -4376,17 +4379,17 @@ b_curon1:
 *****************************************
 
 b_curoff::
-		tst.b	(CSRSW)
-		bne	b_curoff1	*_OS_CUROFの状態
+	tst.b	(CSRSW)
+	bne	b_curoff1		*_OS_CUROFの状態
 b_curoff5:
-		move	#5,(CSRTIMER)
-		sf	(CSRSWITCH)
-		tst.b	(CSRSTAT)
-		beq	b_curoff1
-		bsr	csrwrite	*カーソルを消去
-		sf	(CSRSTAT)
+	move	#5,(CSRTIMER)
+	sf	(CSRSWITCH)
+	tst.b	(CSRSTAT)
+	beq	b_curoff1
+	bsr	csrwrite		*カーソルを消去
+	sf	(CSRSTAT)
 b_curoff1:
-		rts
+	rts
 
 
 *****************************************
@@ -4408,8 +4411,8 @@ os_curon2:
 	st	(CSRSWITCH)
 	sf	(CSRSW)
 os_curon_rte::
-		move	(sp)+,sr
-		rts
+	move	(sp)+,sr
+	rts
 
 
 *****************************************
@@ -4417,8 +4420,8 @@ os_curon_rte::
 *****************************************
 
 os_curof::
-		st	(CSRSW)
-		bra	b_curoff5
+	st	(CSRSW)
+	bra	b_curoff5
 
 
 *************************************************
@@ -4481,12 +4484,12 @@ csrwrite1:
 *	カーソルパターン描画Ａ
 
 csrwriteA:
-		i:=0
-		.rept	16
-		eor.b	d1,(i.w,a0)	;(a0)/nopより(0,a0)の方が速いかもしれない
-		i:=i+$0080
-		.endm
-		rts
+	i:=0
+	.rept	16
+	eor.b	d1,(i.w,a0)		;(a0)/nopより(0,a0)の方が速いかもしれない
+	i:=i+$0080
+	.endm
+	rts
 
 *	カーソルパターン描画Ｂ
 
@@ -4682,16 +4685,16 @@ jissft9:
 *****************************************
 
 akconv::
-		movea.l	(old_akconv,pc),a0
-		jsr	(a0)
-		tst.l	d0
-		bpl	akconv9
+	movea.l	(old_akconv,pc),a0
+	jsr	(a0)
+	tst.l	d0
+	bpl	akconv9
 
-		move	(UNDEFCHR,pc),d0
+	move	(UNDEFCHR,pc),d0
 akconv9:
-		rts
+	rts
 
-		.end
+	.end
 
 * End of File ------------------------- *
 

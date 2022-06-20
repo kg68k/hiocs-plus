@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (doscon.s)
+	.title	HIOCS PLUS (doscon.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,24 +11,24 @@
 
 * Include Files ----------------------- *
 
-		.include	doscall.mac
-		.include	iocscall.mac
-		.include	hiocs.equ
+	.include	doscall.mac
+	.include	iocscall.mac
+	.include	hiocs.equ
 
 
 * Global Symbols ---------------------- *
 
-		.xref	b_curoff,b_curon
-		.xref	b_putc,putc
-		.xref	old_conctrl,old_fputc,old_fputs,old_inpout
-		.xref	old_print,old_putchar,old_write
-		.xref	KBUFOLDNUM
-		.xref	STDOUTPTR
+	.xref	b_curoff,b_curon
+	.xref	b_putc,putc
+	.xref	old_conctrl,old_fputc,old_fputs,old_inpout
+	.xref	old_print,old_putchar,old_write
+	.xref	KBUFOLDNUM
+	.xref	STDOUTPTR
 
 
 * Text Section ------------------------ *
 
-		.text
+	.text
 
 *****************************************
 *	DOS $02		_PUTCHAR	*
@@ -312,20 +312,20 @@ fputs9:
 *****************************************
 
 conctrl::
-		move	(a6)+,d0
-		cmpi	#18,d0
-		bhi	conctrl8
-		suba.l	a5,a5
+	move	(a6)+,d0
+	cmpi	#18,d0
+	bhi	conctrl8
+	suba.l	a5,a5
 .if CPU>=68020
-		movea.l	(_B_PUTC*4+$400,d0.w*4),a0
-		jmp	(conjmptbl,pc,d0.w*2)
+	movea.l	(_B_PUTC*4+$400,d0.w*4),a0
+	jmp	(conjmptbl,pc,d0.w*2)
 .else
-		add	d0,d0			;x2
-		move	d0,d1
-		add	d1,d1			;x4
-		lea	(_B_PUTC*4+$400),a0
-		movea.l	(a0,d1.w),a0
-		jmp	(conjmptbl,pc,d0.w)
+	add	d0,d0			;x2
+	move	d0,d1
+	add	d1,d1			;x4
+	lea	(_B_PUTC*4+$400),a0
+	movea.l	(a0,d1.w),a0
+	jmp	(conjmptbl,pc,d0.w)
 .endif
 
 conctrl8:
@@ -549,7 +549,7 @@ write99:				*<+05
 	move	KBUFOLDNUM(pc),d4
 	rts
 
-		.end
+	.end
 
 * End of File ------------------------- *
 

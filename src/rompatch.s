@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (rompatch.s)
+	.title	HIOCS PLUS (rompatch.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,7 +11,7 @@
 
 * Include Files ----------------------- *
 
-		.include	hiocs.equ
+	.include	hiocs.equ
 
 * Fixed Numbers ----------------------- *
 
@@ -32,11 +32,11 @@ _DMA_BAR2:	.equ	$e8409c		*ベースアドレスレジスタ
 
 * Text Section ------------------------ *
 
-		.text
+	.text
 
 patchbegin::
-		.dc.b	'HIOCS bug patch for ROM IOCS',0
-		.even
+	.dc.b	'HIOCS bug patch for ROM IOCS',0
+	.even
 
 
 *****************************************
@@ -181,7 +181,7 @@ ms_patst2:
 
 patchend::
 
-		.end
+	.end
 
 * End of File ------------------------- *
 

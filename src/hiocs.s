@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (hiocs.s)
+	.title	HIOCS PLUS (hiocs.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,42 +11,42 @@
 
 * Include Files ----------------------- *
 
-		.include	doscall.mac
-		.include	iocscall.mac
-		.include	hiocs.equ
+	.include	doscall.mac
+	.include	iocscall.mac
+	.include	hiocs.equ
 
 
 * Global Symbols ---------------------- *
 
-		.xref	dev_header
-		.xref	csrwink
-		.xref	timercint
-		.xref	sccbrcv
-		.xref	FONTANK6,FONTKNJ16A,FONTKNJ16C
-		.xref	LOGBUFVECT
-		.xref	STDOUTPTR
+	.xref	dev_header
+	.xref	csrwink
+	.xref	timercint
+	.xref	sccbrcv
+	.xref	FONTANK6,FONTKNJ16A,FONTKNJ16C
+	.xref	LOGBUFVECT
+	.xref	STDOUTPTR
 * ROMPATCH
-		.xref	patchbegin,patchend,gpalet,dmamove,ms_patst
+	.xref	patchbegin,patchend,gpalet,dmamove,ms_patst
 * CONDRV
-		.xref	putc,putc_log,putc_escsq0
+	.xref	putc,putc_log,putc_escsq0
 * rte修正
-		.xref	os_curon_rte,mscdraw_rte,mscerase_rte,txyline_rte,txline_rte
+	.xref	os_curon_rte,mscdraw_rte,mscerase_rte,txyline_rte,txline_rte
 * MOUSE
-		.xref	mscdrawA,msceraseA,msctrlsetA,msctrlsetB,msdpatch1,msdpatch2,msepatch1,msepatch2
+	.xref	mscdrawA,msceraseA,msctrlsetA,msctrlsetB,msdpatch1,msdpatch2,msepatch1,msepatch2
 
-		.xref	akconv,jissft,sftjis
-		.xref	b_clr_st,b_del,b_era_st,b_ins
-		.xref	b_down,b_down_s,b_left,b_locate,b_right,b_up,b_up_s
-		.xref	b_color,b_conmod,b_consol,defchr
-		.xref	b_curoff,b_curon,os_curof,os_curon
-		.xref	b_print,b_putc,b_putmes
-		.xref	box,circle,fill,drawmode,getgrm,line,paint,point,pset,putgrm,symbol,wipe
-		.xref	chr_adr,fntadr,fntget,putchar
-		.xref	ms_curgt,ms_curof,ms_curon,ms_curst,ms_getdt,ms_init,ms_stat,ms_vcs
-		.xref	txbox,txfill,txline,txrev,txxline,txyline
-		.xref	fputc,fputs,conctrl,inpout,print,write
-		.xref	clear_mpu_cache
-		.xref	txrascpy
+	.xref	akconv,jissft,sftjis
+	.xref	b_clr_st,b_del,b_era_st,b_ins
+	.xref	b_down,b_down_s,b_left,b_locate,b_right,b_up,b_up_s
+	.xref	b_color,b_conmod,b_consol,defchr
+	.xref	b_curoff,b_curon,os_curof,os_curon
+	.xref	b_print,b_putc,b_putmes
+	.xref	box,circle,fill,drawmode,getgrm,line,paint,point,pset,putgrm,symbol,wipe
+	.xref	chr_adr,fntadr,fntget,putchar
+	.xref	ms_curgt,ms_curof,ms_curon,ms_curst,ms_getdt,ms_init,ms_stat,ms_vcs
+	.xref	txbox,txfill,txline,txrev,txxline,txyline
+	.xref	fputc,fputs,conctrl,inpout,print,write
+	.xref	clear_mpu_cache
+	.xref	txrascpy
 
 
 * Fixed Numbers ----------------------- *
@@ -59,20 +59,20 @@ FONTSIZE3:	.equ	286848-145472	*ＪＩＳ第２水準漢字
 
 * Macros ------------------------------ *
 
-PRINT:		.macro	adr
-		pea	adr
-		DOS	_PRINT
-		addq.l	#4,sp
-		.endm
+PRINT:	.macro	adr
+	pea	adr
+	DOS	_PRINT
+	addq.l	#4,sp
+	.endm
 
 
 * Text Section ------------------------ *
 
-		.text
-		.even
+	.text
+	.even
 checkstr:
-		.dc.b	HIOCS_ID,version		*(16bytes)
-		.dc.b	'IOCS'
+	.dc.b	HIOCS_ID,version		*(16bytes)
+	.dc.b	'IOCS'
 
 
 *************************************************
@@ -80,24 +80,24 @@ checkstr:
 *************************************************
 
 iocscall:
-		move.l	a0,-(sp)
+	move.l	a0,-(sp)
 .if CPU>=68020
-		andi.l	#$00ff,d0
-		move	d0,(IOCSNUM)
-		jsr	([$400,d0.w*4])
+	andi.l	#$00ff,d0
+	move	d0,(IOCSNUM)
+	jsr	([$400,d0.w*4])
 .else
-		andi	#$00ff,d0
-		ext.l	d0
-		move	d0,(IOCSNUM)
-		movea.l	d0,a0
-		adda	a0,a0
-		adda	a0,a0
-		movea.l	($400,a0),a0
-		jsr	(a0)
+	andi	#$00ff,d0
+	ext.l	d0
+	move	d0,(IOCSNUM)
+	movea.l	d0,a0
+	adda	a0,a0
+	adda	a0,a0
+	movea.l	($400,a0),a0
+	jsr	(a0)
 .endif
-		move	#-1,(IOCSNUM)
-		movea.l	(sp)+,a0
-		rte
+	move	#-1,(IOCSNUM)
+	movea.l	(sp)+,a0
+	rte
 
 
 *************************************************
@@ -144,28 +144,28 @@ setvect1:
 	cmpa.l	#$ff0000,a3
 	bcs	setvect13		*timer-C処理は変更されている
 
-		move.l	a3,(a2)
-		lea	(timercint,pc),a2
-		move.l	a2,(TIMERCVEC)
+	move.l	a3,(a2)
+	lea	(timercint,pc),a2
+	move.l	a2,(TIMERCVEC)
 setvect13:
-		bsr	check_condrv_mark
-		bne	setvect2	*CONDRV.SYSは常駐していない
+	bsr	check_condrv_mark
+	bne	setvect2		*CONDRV.SYSは常駐していない
 
-		lea	(LOGBUFVECT,pc),a3
-		move.l	(-16,a2),(a3)+
-		pea	(-28,a2)	*CONDRV.SYSのオプションの格納アドレス
-		move.l	(sp)+,(a3)+	*CONDFLAG
-		move.l	(-22,a2),(a3)	*CONDSYSCALL
+	lea	(LOGBUFVECT,pc),a3
+	move.l	(-16,a2),(a3)+
+	pea	(-28,a2)		*CONDRV.SYSのオプションの格納アドレス
+	move.l	(sp)+,(a3)+		*CONDFLAG
+	move.l	(-22,a2),(a3)		*CONDSYSCALL
 
-		lea	(CONDRVPATCH,pc),a2
-		lea	(putc,pc),a3	*CONDRV.SYS用のパッチ当てを行なう
-		move.l	(a3),(a2)+
-		move.l	#BRA_W<<16+.loww.(putc_log-(putc+2)),(a3)
-		addq.b	#(BNE_W-BRA_W)>>8,(putc_escsq0-putc,a3)
-*		lea	(CONDRVFLG,pc),a2
-		st	(a2)
+	lea	(CONDRVPATCH,pc),a2
+	lea	(putc,pc),a3		*CONDRV.SYS用のパッチ当てを行なう
+	move.l	(a3),(a2)+
+	move.l	#BRA_W<<16+.loww.(putc_log-(putc+2)),(a3)
+	addq.b	#(BNE_W-BRA_W)>>8,(putc_escsq0-putc,a3)
+*	lea	(CONDRVFLG,pc),a2
+	st	(a2)
 
-		bsr	clear_mpu_cache
+	bsr	clear_mpu_cache
 setvect2:
 	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	bne	setvect3		*すでに変更されている
@@ -223,32 +223,32 @@ setvect5:
 	moveq	#0,d1
 	IOCS	_SETMSADR		*マウスカーソル表示処理アドレス変更
 setvect10:
-		moveq	#0,d0
-		rts
+	moveq	#0,d0
+	rts
 
 check_condrv_mark:
-		movea.l	(_KEY_INIT*4+$400),a2
-		cmpi.l	#'hmk*',(-4,a2)
+	movea.l	(_KEY_INIT*4+$400),a2
+	cmpi.l	#'hmk*',(-4,a2)
 chgvecttbl2:
-		rts
+	rts
 
 *	IOCS/DOSベクタを変更する
 
 chgvecttbl_iocs:
-		lea	($400),a2
+	lea	($400),a2
 chgvecttbl:
-		move.l	a3,d1
+	move.l	a3,d1
 chgvecttbl1:
-		move	(a3)+,d0
-		bmi	chgvecttbl2
+	move	(a3)+,d0
+	bmi	chgvecttbl2
 
-		add	d0,d0
-		add	d0,d0
-		movea.l	d1,a4
-		adda	(a3)+,a4	*変更先アドレス
-		move.l	(a2,d0.w),(a3)+	*現在のベクタを保存
-		move.l	a4,(a2,d0.w)	*ベクタを変更する
-		bra	chgvecttbl1
+	add	d0,d0
+	add	d0,d0
+	movea.l	d1,a4
+	adda	(a3)+,a4		*変更先アドレス
+	move.l	(a2,d0.w),(a3)+		*現在のベクタを保存
+	move.l	a4,(a2,d0.w)		*ベクタを変更する
+	bra	chgvecttbl1
 
 *	DOS内ファイルハンドルバッファを検索
 
@@ -304,11 +304,11 @@ restorevect1:
 	bne	restorevect99
 
 restorevect15:
-		move.b	(CONDRVFLG,pc),d0
-		beq	restorevect2	*CONDRV.SYSは常駐していない
+	move.b	(CONDRVFLG,pc),d0
+	beq	restorevect2		*CONDRV.SYSは常駐していない
 
-		bsr	check_condrv_mark
-		bne	restorevect99
+	bsr	check_condrv_mark
+	bne	restorevect99
 restorevect2:
 	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	beq	restorevect3		*変更されていない
@@ -385,16 +385,16 @@ restorevect51:
 	move.l	d0,(TIMERCVEC)
 
 restorevect513:
-		move.b	(CONDRVFLG,pc),d0
-		beq	restorevect52	*CONDRV.SYSは常駐していない
+	move.b	(CONDRVFLG,pc),d0
+	beq	restorevect52		*CONDRV.SYSは常駐していない
 
-		lea	(CONDRVPATCH,pc),a2
-		lea	(putc,pc),a3
-		move.l	(a2)+,(a3)
-*		lea	(CONDRVFLG,pc),a2
-		sf	(a2)
+	lea	(CONDRVPATCH,pc),a2
+	lea	(putc,pc),a3
+	move.l	(a2)+,(a3)
+*	lea	(CONDRVFLG,pc),a2
+	sf	(a2)
 
-		bsr	clear_mpu_cache
+	bsr	clear_mpu_cache
 restorevect52:
 	tst.b	(~IOCSGRFLG,a1)		*IOCSグラフィック描画ベクタ
 	beq	restorevect53		*変更されていない
@@ -438,53 +438,53 @@ restorevect55:
 	IOCS	_SETMSADR		*マウスカーソル表示処理アドレス変更
 
 restorevect60:
-		moveq	#0,d0
-		rts
+	moveq	#0,d0
+	rts
 restorevect99:
-		moveq	#-1,d0
-		rts
+	moveq	#-1,d0
+	rts
 
 
 *	変更したIOCS/DOSベクタを元に戻す
 
 rstvecttbl_iocs:
-		lea	($400),a2
-		bra	rstvecttbl
+	lea	($400),a2
+	bra	rstvecttbl
 rstvecttbl1:
-		add	d0,d0
-		add	d0,d0
-		addq.l	#2,a3
-		move.l	(a3),(a2,d0.w)
-		clr.l	(a3)+
+	add	d0,d0
+	add	d0,d0
+	addq.l	#2,a3
+	move.l	(a3),(a2,d0.w)
+	clr.l	(a3)+
 rstvecttbl:
-		move	(a3)+,d0
-		bpl	rstvecttbl1
-		rts
+	move	(a3)+,d0
+	bpl	rstvecttbl1
+	rts
 
 
 *	IOCS/DOSベクタが変更されていないか調べる
 
 chkvecttbl_iocs:
-		lea	($400),a2
+	lea	($400),a2
 chkvecttbl:
-		move.l	a3,d1
+	move.l	a3,d1
 chkvecttbl1:
-		move	(a3)+,d0
-		bmi	chkvecttbl2
+	move	(a3)+,d0
+	bmi	chkvecttbl2
 
-		add	d0,d0
-		add	d0,d0
-		movea.l	d1,a4
-		adda	(a3)+,a4
-		addq.l	#4,a3
-		cmp.l	(a2,d0.w),a4
-		beq	chkvecttbl1
+	add	d0,d0
+	add	d0,d0
+	movea.l	d1,a4
+	adda	(a3)+,a4
+	addq.l	#4,a3
+	cmp.l	(a2,d0.w),a4
+	beq	chkvecttbl1
 
-		moveq	#-1,d0		*ベクタが変更されている
-		rts
+	moveq	#-1,d0			*ベクタが変更されている
+	rts
 chkvecttbl2:
-		moveq	#0,d0		*ベクタは変更されていない
-		rts
+	moveq	#0,d0			*ベクタは変更されていない
+	rts
 
 *****************************************
 *	未定義漢字コードを設定する	*
@@ -537,22 +537,22 @@ setundefchr6:
 
 *	IOCTRL用データ
 
-		.offset	0
+	.offset	0
 ~IOCSCALLFLG:	.ds.b	1	*trap #15処理ルーチン変更フラグ	(※順序を変更しないこと)
 ~IOCSCONFLG:	.ds.b	1	*IOCS文字出力ベクタ変更フラグ
 ~IOCSGRFLG:	.ds.b	1	*IOCSグラフィック描画ベクタ変更フラグ
 ~DOSCONFLG:	.ds.b	1	*DOS文字出力ベクタ変更フラグ
 ~IOCSMSFLG:	.ds.b	1	*IOCSマウス処理ベクタ変更フラグ
 VECTFLGSIZE:
-		.text
+	.text
 
-		.even
+	.even
 IOCTRLDATA:	.dc.b	HIOCS_ID,version	*(16bytes)
 IOCTRLERR:	.ds	1			*(IOCTRL時のエラーコード)
 TOPADR:		.dc.l	0	*常駐部先頭アドレス(デバイスドライバ登録なら0)
 
 IOVECTFLG:	.ds.b	VECTFLGSIZE
-		.even
+	.even
 
 EXFONTBUF:	.dc.l	0	*拡張フォントバッファ先頭アドレス(なければ0)
 FONTBUFSIZE:	.dc.b	0	*フォントバッファサイズ(0～3)
@@ -576,7 +576,7 @@ IOCTRLSIZE:	.equ	IOCTRLEND-IOCTRLDATA
 
 CONDRVPATCH:	.ds.l	1
 CONDRVFLG:	.dc.b	0	*CONDRV.SYS対応フラグ
-		.even
+	.even
 
 UNDEFJIS::	.dc	$2228	*		    (ＪＩＳコード)
 UNDEFPTR::	.dc.l	$f00ca0	*		    フォントアドレス
@@ -597,23 +597,23 @@ patchtbl:	.ds.l	PATCHTBL_SIZE
 
 *	IOCSベクタテーブル
 
-viocsc:		.macro	callno,addr
-		.dc	callno,addr-iocsctbl
+viocsc:	.macro	callno,addr
+	.dc	callno,addr-iocsctbl
 old_&addr::
-		.ds.l	1
-		.endm
+	.ds.l	1
+	.endm
 
-viocsg:		.macro	callno,addr
-		.dc	callno,addr-iocsgtbl
+viocsg:	.macro	callno,addr
+	.dc	callno,addr-iocsgtbl
 old_&addr::
-		.ds.l	1
-		.endm
+	.ds.l	1
+	.endm
 
-viocsm:		.macro	callno,addr
-		.dc	callno,addr-iocsmtbl
+viocsm:	.macro	callno,addr
+	.dc	callno,addr-iocsmtbl
 old_&addr::
-		.ds.l	1
-		.endm
+	.ds.l	1
+	.endm
 
 iocsctbl:
 	viocsc	_DEFCHR,defchr
@@ -682,11 +682,11 @@ iocsmtbl:
 
 *	DOSベクタテーブル
 
-vdosc:		.macro	callno,addr
-		.dc	callno.and.$ff,addr-dosctbl
+vdosc:	.macro	callno,addr
+	.dc	callno.and.$ff,addr-dosctbl
 old_&addr::
-		.ds.l	1
-		.endm
+	.ds.l	1
+	.endm
 
 dosctbl:
 	vdosc	_PUTCHAR,putchar
@@ -703,11 +703,11 @@ dosctbl:
 *	@IOCS	ストラテジルーチン	*
 *****************************************
 
-		.cpu	68000
+	.cpu	68000
 dev_strtgy::
-		move.l	a5,(dev_rqhptr)	*リクエストヘッダへのポインタ
-		rts
-		.cpu	CPU
+	move.l	a5,(dev_rqhptr)	*リクエストヘッダへのポインタ
+	rts
+	.cpu	CPU
 
 
 *****************************************
@@ -717,22 +717,22 @@ dev_strtgy::
 *	X68000でhiocs030.xを組み込もうとした場合を考慮すると
 *	ここでは68020命令を使ってはいけない。
 
-		.cpu	68000
+	.cpu	68000
 dev_intrpt::
-		movem.l	d0-d7/a0-a6,-(sp)
-		movea.l	(dev_rqhptr,pc),a5
-		moveq	#0,d0
-		move.b	(2,a5),d0	*コマンドコード
-		add	d0,d0
-		move	(dev_jmptbl,pc,d0.w),d0
-		jsr	(dev_jmptbl,pc,d0.w)
-		addq.l	#3,a5
-		move.b	d0,(a5)+	*エラーコード	 (L)
-		move	d0,-(sp)	;lsr	#8,d0
-		move.b	(sp)+,(a5)	;move.b	d0,(a5)	*(H)
-		movem.l	(sp)+,d0-d7/a0-a6
-		rts
-		.cpu	CPU
+	movem.l	d0-d7/a0-a6,-(sp)
+	movea.l	(dev_rqhptr,pc),a5
+	moveq	#0,d0
+	move.b	(2,a5),d0		*コマンドコード
+	add	d0,d0
+	move	(dev_jmptbl,pc,d0.w),d0
+	jsr	(dev_jmptbl,pc,d0.w)
+	addq.l	#3,a5
+	move.b	d0,(a5)+		*エラーコード	 (L)
+	move	d0,-(sp)		;lsr	#8,d0
+	move.b	(sp)+,(a5)		;move.b	d0,(a5)	*(H)
+	movem.l	(sp)+,d0-d7/a0-a6
+	rts
+	.cpu	CPU
 
 dev_rqhptr:	.ds.l	1		*リクエストヘッダへのポインタ
 dev_jmptbl:				*コマンド処理ルーチンのジャンプテーブル
@@ -753,87 +753,87 @@ dev_jmptbl:				*コマンド処理ルーチンのジャンプテーブル
 *	エラー
 
 dev_err:
-		move	#$5003,d0	*コマンドコードが不正
-		rts
+	move	#$5003,d0		*コマンドコードが不正
+	rts
 
 *	ステータスチェック
 
 dev_instat:
-		moveq	#1,d0
-		rts
+	moveq	#1,d0
+	rts
 
 *	IOCTRL入力
 
 dev_iocin:
-		move.l	(18,a5),d0	*転送バイト数
-		moveq	#IOCTRLSIZE,d1
-		cmp.l	d1,d0
-		bls	dev_iocin0	*(バージョンチェックを有効にするため)
+	move.l	(18,a5),d0		*転送バイト数
+	moveq	#IOCTRLSIZE,d1
+	cmp.l	d1,d0
+	bls	dev_iocin0		*(バージョンチェックを有効にするため)
 
-		move.l	d1,d0
+	move.l	d1,d0
 dev_iocin0:
-		movea.l	(14,a5),a0	*転送バッファアドレス
-		lea	(IOCTRLDATA,pc),a1
-		subq.l	#1,d0
+	movea.l	(14,a5),a0		*転送バッファアドレス
+	lea	(IOCTRLDATA,pc),a1
+	subq.l	#1,d0
 @@:
-		move.b	(a1)+,(a0)+	*IOCTRLデータを転送する
-		dbra	d0,@b
+	move.b	(a1)+,(a0)+		*IOCTRLデータを転送する
+	dbra	d0,@b
 dev_outstat:
 dev_flush:
-		moveq	#0,d0
-		rts
+	moveq	#0,d0
+	rts
 
 *	IOCTRL出力
 
 dev_iocout:
-		move.l	(18,a5),d0	*転送バイト数
-		moveq	#IOCTRLSIZE,d1
-		cmp.l	d1,d0
-		bne	dev_err
+	move.l	(18,a5),d0		*転送バイト数
+	moveq	#IOCTRLSIZE,d1
+	cmp.l	d1,d0
+	bne	dev_err
 
-		movea.l	(14,a5),a6	*転送バッファアドレス
-		movea.l	a6,a0
-		lea	(IOCTRLDATA,pc),a1
-		moveq	#16-1,d0
+	movea.l	(14,a5),a6		*転送バッファアドレス
+	movea.l	a6,a0
+	lea	(IOCTRLDATA,pc),a1
+	moveq	#16-1,d0
 dev_iocout1:
-		cmpm.b	(a0)+,(a1)+	*バージョン文字列を比較する
-		dbne	d0,dev_iocout1
-		bne	dev_err
+	cmpm.b	(a0)+,(a1)+		*バージョン文字列を比較する
+	dbne	d0,dev_iocout1
+	bne	dev_err
 
-		lea	(IOVECTFLG-IOCTRLDATA,a6),a0
-		lea	(IOVECTFLG,pc),a1
-		bsr	restorevect	*IOCS/DOSベクタを元に戻す
-		bne	dev_iocout9	*ベクタが変更されている
-		bsr	setvect		*IOCS/DOSベクタを変更する
+	lea	(IOVECTFLG-IOCTRLDATA,a6),a0
+	lea	(IOVECTFLG,pc),a1
+	bsr	restorevect		*IOCS/DOSベクタを元に戻す
+	bne	dev_iocout9		*ベクタが変更されている
+	bsr	setvect			*IOCS/DOSベクタを変更する
 
-		lea	(EXFONTBUF-IOCTRLDATA,a6),a0
-		lea	(EXFONTBUF,pc),a1
-		moveq	#(IOCTRLEND-EXFONTBUF)-1,d0
+	lea	(EXFONTBUF-IOCTRLDATA,a6),a0
+	lea	(EXFONTBUF,pc),a1
+	moveq	#(IOCTRLEND-EXFONTBUF)-1,d0
 dev_iocout2:
-		move.b	(a0)+,(a1)+	*その他のフラグを変更する
-		dbra	d0,dev_iocout2
+	move.b	(a0)+,(a1)+		*その他のフラグを変更する
+	dbra	d0,dev_iocout2
 
-		bsr	setundefchr
-		moveq	#0,d0
-		move	d0,(IOCTRLERR-IOCTRLDATA,a6)
-		rts
+	bsr	setundefchr
+	moveq	#0,d0
+	move	d0,(IOCTRLERR-IOCTRLDATA,a6)
+	rts
 
 dev_iocout9:				*ベクタが変更されている場合
-		move	#-1,(IOCTRLERR-IOCTRLDATA,a6)
-		moveq	#0,d0
-		rts
+	move	#-1,(IOCTRLERR-IOCTRLDATA,a6)
+	moveq	#0,d0
+	rts
 
 *	入力
 
 dev_in:
-		move.l	(18,a5),d0	*転送バイト数
-		subq.l	#7,d0
-		bcc	dev_err
+	move.l	(18,a5),d0		*転送バイト数
+	subq.l	#7,d0
+	bcc	dev_err
 
-		movea.l	(14,a5),a0	*転送バッファアドレス
-		move	#-1,(a0)	*(IOCS.Xに対するダミー)
-		moveq	#0,d0
-		rts
+	movea.l	(14,a5),a0		*転送バッファアドレス
+	move	#-1,(a0)		*(IOCS.Xに対するダミー)
+	moveq	#0,d0
+	rts
 
 *	出力
 
@@ -907,18 +907,18 @@ dev_init9:
 	adda.l	d2,a2
 	move.l	#'iocs',(a2)+
 
-		tst.b	d6
-		bne	dev_init95
+	tst.b	d6
+	bne	dev_init95
 
-		move.l	a2,(14,a5)	*デバイスドライバ終了アドレス
-		moveq	#0,d0
-		rts
+	move.l	a2,(14,a5)		*デバイスドライバ終了アドレス
+	moveq	#0,d0
+	rts
 dev_init95:				*コマンドライン登録の場合
-		lea	(dev_header,pc),a0
-		suba.l	a0,a2
-		clr	-(sp)
-		move.l	a2,-(sp)
-		DOS	_KEEPPR
+	lea	(dev_header,pc),a0
+	suba.l	a0,a2
+	clr	-(sp)
+	move.l	a2,-(sp)
+	DOS	_KEEPPR
 
 lentosize:
 	move.l	a0,-(sp)
@@ -963,438 +963,438 @@ RAMFONTBUF:				*ＲＡＭフォントはここから格納される
 
 *	初期化
 
-		.cpu	68000
+	.cpu	68000
 dev_init:
-		PRINT	(title_msg,pc)
+	PRINT	(title_msg,pc)
 .if CPU==68030
-		cmpi.b	#2,(MPUTYPE)
-		bcs	dev_init_err_mpu
+	cmpi.b	#2,(MPUTYPE)
+	bcs	dev_init_err_mpu
 .endif
-		.cpu	CPU
+	.cpu	CPU
 
-		lea	(FLAG_DEV,pc),a0
-		st	(a0)
-		lea	(dev_jmptbl,pc),a0
-		move	#dev_err-dev_jmptbl,(0,a0)
+	lea	(FLAG_DEV,pc),a0
+	st	(a0)
+	lea	(dev_jmptbl,pc),a0
+	move	#dev_err-dev_jmptbl,(0,a0)
 
-		lea	(IOVECTFLG,pc),a0
-		moveq	#VECTFLGSIZE-1,d0
+	lea	(IOVECTFLG,pc),a0
+	moveq	#VECTFLGSIZE-1,d0
 dev_init1:
-		st	(a0)+		*全ベクタを変更する(デフォルト)
-		dbra	d0,dev_init1
+	st	(a0)+			*全ベクタを変更する(デフォルト)
+	dbra	d0,dev_init1
 
-		movea.l	(18,a5),a1	*パラメータポインタ
-		bsr	dev_param	*パラメータを解釈する
-		bmi	dev_init_err
+	movea.l	(18,a5),a1		*パラメータポインタ
+	bsr	dev_param		*パラメータを解釈する
+	bmi	dev_init_err
 
-		move.b	(FLAG_R,pc),d0
-		bne	dev_init_err	*デバイスドライバ組み込み時は/rは指定不可
+	move.b	(FLAG_R,pc),d0
+	bne	dev_init_err		*デバイスドライバ組み込み時は/rは指定不可
 
-		bsr	mask_spurious		;スプリアス割り込みを無効化
+	bsr	mask_spurious		;スプリアス割り込みを無効化
 .if CPU==68000
-		bsr	rte_patch
+	bsr	rte_patch
 .endif
-		bsr	rompatch	*IOCS ROM へのパッチ当て
-		lea	(patchtbl,pc),a0	*<+03
+	bsr	rompatch		*IOCS ROM へのパッチ当て
+	lea	(patchtbl,pc),a0	*<+03
 	.rept	PATCHTBL_SIZE
-		clr.l	(a0)+		*(デバイスドライバ組み込みの場合は
+	clr.l	(a0)+			*(デバイスドライバ組み込みの場合は
 	.endm				*	パッチ解除は無効)
 
-		bsr	copyank8	*ＲＯＭフォントをＲＡＭに転送
+	bsr	copyank8		*ＲＯＭフォントをＲＡＭに転送
 
-		lea	(VECTFLG,pc),a0
-		lea	(IOVECTFLG,pc),a1
-		moveq	#VECTFLGSIZE-1,d0
+	lea	(VECTFLG,pc),a0
+	lea	(IOVECTFLG,pc),a1
+	moveq	#VECTFLGSIZE-1,d0
 dev_init2:
-		move.b	(a1),(a0)+
-		sf	(a1)+
-		dbra	d0,dev_init2
+	move.b	(a1),(a0)+
+	sf	(a1)+
+	dbra	d0,dev_init2
 
-		lea	(VECTFLG,pc),a0
-		lea	(IOVECTFLG,pc),a1
-		bsr	setvect		*ベクタを変更する
+	lea	(VECTFLG,pc),a0
+	lea	(IOVECTFLG,pc),a1
+	bsr	setvect			*ベクタを変更する
 
-		bsr	readfont_dev	*フォントファイルを読み込む
-		lea	(FONTBUFSIZE,pc),a0
-		move.b	d1,(a0)+
-		move.b	d1,(a0)
-		move.l	d1,-(sp)
-		bsr	setundefchr	*未定義漢字コードを設定する
-		move.l	(sp)+,d1
+	bsr	readfont_dev		*フォントファイルを読み込む
+	lea	(FONTBUFSIZE,pc),a0
+	move.b	d1,(a0)+
+	move.b	d1,(a0)
+	move.l	d1,-(sp)
+	bsr	setundefchr		*未定義漢字コードを設定する
+	move.l	(sp)+,d1
 
-		moveq	#0,d6
-		bra	dev_init9
+	moveq	#0,d6
+	bra	dev_init9
 
-		.cpu	68000
+	.cpu	68000
 dev_init_err:				*初期化時のエラー
-		pea	(paramerr_msg,pc)
-		bra	@f
+	pea	(paramerr_msg,pc)
+	bra	@f
 .if CPU==68030
 dev_init_err_mpu:
-		pea	(mpu_err_msg,pc)
+	pea	(mpu_err_msg,pc)
 .endif
 @@:
-		DOS	_PRINT
-		addq.l	#4,sp
-		move	#$500c,d0
-		rts
-		.cpu	CPU
+	DOS	_PRINT
+	addq.l	#4,sp
+	move	#$500c,d0
+	rts
+	.cpu	CPU
 
 *	8×16半角フォントをＲＡＭ上に転送する
 
 copyank8:
-		lea	(fon_ank8),a0
-		lea	(DATABUF,pc),a1
-		move	#FONTSIZE0/4-1,d0
+	lea	(fon_ank8),a0
+	lea	(DATABUF,pc),a1
+	move	#FONTSIZE0/4-1,d0
 copyank81:
-		move.l	(a0)+,(a1)+
-		dbra	d0,copyank81
-		rts
+	move.l	(a0)+,(a1)+
+	dbra	d0,copyank81
+	rts
 
 *	フォントファイルをバッファに読み込む
 
 readfont_dev:
-		bsr	readfont_init
-		movea.l	(18,a5),a1
-		bra	skip_fontname
+	bsr	readfont_init
+	movea.l	(18,a5),a1
+	bra	skip_fontname
 @@:
-		move.l	a1,-(sp)
-		bsr	readfont_sub
-		movea.l	(sp)+,a1
-		bmi	readfont9
+	move.l	a1,-(sp)
+	bsr	readfont_sub
+	movea.l	(sp)+,a1
+	bmi	readfont9
 skip_fontname:
-		tst.b	(a1)+
-		bne	skip_fontname
-		move.b	(a1),d0
-		beq	readfont9
-		cmpi.b	#'-',d0
-		beq	skip_fontname
-		bra	@b
+	tst.b	(a1)+
+	bne	skip_fontname
+	move.b	(a1),d0
+	beq	readfont9
+	cmpi.b	#'-',d0
+	beq	skip_fontname
+	bra	@b
 
 readfont_cmd:
-		bsr	readfont_init
-		move.l	(dev_header-$100+$20,pc),-(sp)
-		addq.l	#1,(sp)
-		bsr	GetArgCharInit
-		addq.l	#4,sp
-		bra	@f
+	bsr	readfont_init
+	move.l	(dev_header-$100+$20,pc),-(sp)
+	addq.l	#1,(sp)
+	bsr	GetArgCharInit
+	addq.l	#4,sp
+	bra	@f
 skip_option:
-		bsr	GetArgChar
-		tst.b	d0
-		bne	skip_option
+	bsr	GetArgChar
+	tst.b	d0
+	bne	skip_option
 @@:
-		bsr	GetArgChar
-		tst.l	d0
-		beq	readfont9
-		bmi	@b
-		cmpi.b	#'-',d0
-		beq	skip_option
-		cmpi.b	#'+',d0
-		beq	skip_option
+	bsr	GetArgChar
+	tst.l	d0
+	beq	readfont9
+	bmi	@b
+	cmpi.b	#'-',d0
+	beq	skip_option
+	cmpi.b	#'+',d0
+	beq	skip_option
 
-		lea	(filename_buf,pc),a1
-		move.b	d0,(a1)+
-1:		bsr	GetArgChar
-		move.b	d0,(a1)+		;ファイル名を転送する
-		bne	1b
+	lea	(filename_buf,pc),a1
+	move.b	d0,(a1)+
+1:	bsr	GetArgChar
+	move.b	d0,(a1)+		;ファイル名を転送する
+	bne	1b
 
-		lea	(filename_buf,pc),a1
-		bsr	readfont_sub
-		bpl	@b
+	lea	(filename_buf,pc),a1
+	bsr	readfont_sub
+	bpl	@b
 readfont9:
-		tst.l	d4
-		rts
+	tst.l	d4
+	rts
 
 readfont_sub:
-		movem.l	d1-d2,-(sp)
-		clr	-(sp)
-		move.l	a1,-(sp)
-		DOS	_OPEN		*フォントファイルをオープンする
-		addq.l	#6,sp
-		move.l	d0,d3
-		bmi	readfont81	*ファイルがオープンできなかった
+	movem.l	d1-d2,-(sp)
+	clr	-(sp)
+	move.l	a1,-(sp)
+	DOS	_OPEN			*フォントファイルをオープンする
+	addq.l	#6,sp
+	move.l	d0,d3
+	bmi	readfont81		*ファイルがオープンできなかった
 
-		move	#2,-(sp)
-		clr.l	-(sp)
-		move	d3,-(sp)
-		DOS	_SEEK		*ファイルサイズを得る
-		addq.l	#8,sp
+	move	#2,-(sp)
+	clr.l	-(sp)
+	move	d3,-(sp)
+	DOS	_SEEK			*ファイルサイズを得る
+	addq.l	#8,sp
 
-		move.l	d0,d2
-		bsr	lentosize
-		tst.b	d1
-		bmi	readfont80	*ファイルサイズが不正
+	move.l	d0,d2
+	bsr	lentosize
+	tst.b	d1
+	bmi	readfont80		*ファイルサイズが不正
 
-		move.b	(FLAG_DEV,pc),d0
-		bne	readfont1	*(デバイスドライバ組み込みの場合)
+	move.b	(FLAG_DEV,pc),d0
+	bne	readfont1		*(デバイスドライバ組み込みの場合)
 
-	 	lea	(DATABUF,pc),a0
-	 	adda.l	d2,a0
-	 	cmpa.l	(dev_header-$100+8,pc),a0
- 		bcc	nomemerr	*メモリが不足している
+ 	lea	(DATABUF,pc),a0
+ 	adda.l	d2,a0
+ 	cmpa.l	(dev_header-$100+8,pc),a0
+	bcc	nomemerr		*メモリが不足している
 readfont1:
-		clr	-(sp)
-		clr.l	-(sp)
-		move	d3,-(sp)
-		DOS	_SEEK		*ファイル先頭へ移動する
-		addq.l	#8,sp
+	clr	-(sp)
+	clr.l	-(sp)
+	move	d3,-(sp)
+	DOS	_SEEK			*ファイル先頭へ移動する
+	addq.l	#8,sp
 
-		move.l	d2,-(sp)
-		pea	(DATABUF,pc)
-		move	d3,-(sp)
-		DOS	_READ		*ファイルを読み込む
-*		lea	(10,sp),sp
-*		tst.l	d0
-		addq.l	#10-4,sp
-		move.l	d0,(sp)+
-		bmi	readfont80	*ファイルが読み込めなかった
+	move.l	d2,-(sp)
+	pea	(DATABUF,pc)
+	move	d3,-(sp)
+	DOS	_READ			*ファイルを読み込む
+*	lea	(10,sp),sp
+*	tst.l	d0
+	addq.l	#10-4,sp
+	move.l	d0,(sp)+
+	bmi	readfont80		*ファイルが読み込めなかった
 
-		move	d3,-(sp)
-		DOS	_CLOSE		*ファイルをクローズする
-*		addq.l	#2,sp
+	move	d3,-(sp)
+	DOS	_CLOSE			*ファイルをクローズする
+*	addq.l	#2,sp
 
-		pea	(fontchg_msg,pc)
-		DOS	_PRINT
-		addq.l	#2+4,sp
+	pea	(fontchg_msg,pc)
+	DOS	_PRINT
+	addq.l	#2+4,sp
 
-		cmp.l	(sp),d1
-		bcc	@f
+	cmp.l	(sp),d1
+	bcc	@f
 
-		movem.l	(sp),d1-d2
+	movem.l	(sp),d1-d2
 @@:
-		addq.l	#8,sp
-		moveq	#0,d4
-		rts
+	addq.l	#8,sp
+	moveq	#0,d4
+	rts
 
 readfont81:				*フォントファイルのエラー	<+03
-		pea	(nofont_msg,pc)
-		bra	readfont82
+	pea	(nofont_msg,pc)
+	bra	readfont82
 readfont80:
-		move	d3,-(sp)
-		DOS	_CLOSE		*ファイルをクローズする
-		addq.l	#2,sp
-		pea	(badfont_msg,pc)
+	move	d3,-(sp)
+	DOS	_CLOSE			*ファイルをクローズする
+	addq.l	#2,sp
+	pea	(badfont_msg,pc)
 readfont82:
-		DOS	_PRINT
-		lea	(8+4,sp),sp
-		bsr	copyank8	*ＲＯＭフォントに戻す
+	DOS	_PRINT
+	lea	(8+4,sp),sp
+	bsr	copyank8		*ＲＯＭフォントに戻す
 readfont_init:
-		moveq	#0,d1
-		move.l	(fontsize0,pc),d2
-		moveq	#-1,d4
-		rts
+	moveq	#0,d1
+	move.l	(fontsize0,pc),d2
+	moveq	#-1,d4
+	rts
 
 
 *************************************************
 *	コマンドラインによる起動		*
 *************************************************
 
-		.cpu	68000
+	.cpu	68000
 cmd_exec:
-		bra.s	@f
-		.dc.b	'#HUPAIR',0
+	bra.s	@f
+	.dc.b	'#HUPAIR',0
 @@:
-		movea.l	(8,a0),sp	*メモリブロック終了アドレス＋１をスタックにする
-		clr.l	-(sp)
-		DOS	_SUPER		*スーパーバイザモードに入る
-		addq.l	#4,sp
+	movea.l	(8,a0),sp		*メモリブロック終了アドレス＋１をスタックにする
+	clr.l	-(sp)
+	DOS	_SUPER			*スーパーバイザモードに入る
+	addq.l	#4,sp
 
-		PRINT	(title_msg_2,pc)
+	PRINT	(title_msg_2,pc)
 .if CPU==68030
-		cmpi.b	#2,(MPUTYPE)
-		bcs	mpuerr
+	cmpi.b	#2,(MPUTYPE)
+	bcs	mpuerr
 .endif
-		.cpu	CPU
+	.cpu	CPU
 
-		lea	(16,a0),a5	*プログラムの先頭アドレス
-		lea	(dev_jmptbl,pc),a0
-		move	#dev_err-dev_jmptbl,(a0)
+	lea	(16,a0),a5		*プログラムの先頭アドレス
+	lea	(dev_jmptbl,pc),a0
+	move	#dev_err-dev_jmptbl,(a0)
 
-		pea	(DATABUF,pc)
-		move	#-2,-(sp)
-		DOS	_GET_PR		*自分自身のスレッドの情報を得る
-		addq.l	#6,sp
-		tst.l	d0
-		ble	cmd_exec1	*スレッド０かエラーの場合
+	pea	(DATABUF,pc)
+	move	#-2,-(sp)
+	DOS	_GET_PR			*自分自身のスレッドの情報を得る
+	addq.l	#6,sp
+	tst.l	d0
+	ble	cmd_exec1		*スレッド０かエラーの場合
 
-		pea	(bgerr_msg,pc)
-		bra	errout		*ＢＧでの実行は不可能
+	pea	(bgerr_msg,pc)
+	bra	errout			*ＢＧでの実行は不可能
 cmd_exec1:
-		clr	-(sp)		*<+08(Human v1.0xのバグ回避)
-		pea	(iocsname,pc)
-		DOS	_OPEN		*'@IOCS'をオープン
-		addq.l	#6,sp
-		move.l	d0,d7
-		bmi	cmd_exec50	*オープンできない…未登録の場合
+	clr	-(sp)			*<+08(Human v1.0xのバグ回避)
+	pea	(iocsname,pc)
+	DOS	_OPEN			*'@IOCS'をオープン
+	addq.l	#6,sp
+	move.l	d0,d7
+	bmi	cmd_exec50		*オープンできない…未登録の場合
 
-		move	d7,-(sp)
-		clr	-(sp)
-		DOS	_IOCTRL		*'@IOCS'の装置情報を得る
-		addq.l	#4,sp
-		move	d0,d1		*	<+08
+	move	d7,-(sp)
+	clr	-(sp)
+	DOS	_IOCTRL			*'@IOCS'の装置情報を得る
+	addq.l	#4,sp
+	move	d0,d1			*	<+08
 
-		move	d7,-(sp)
-		DOS	_CLOSE		*'@IOCS'をクローズする
-		addq.l	#2,sp
-		moveq	#-1,d7		*(ファイルディスクリプタを無効にする)
+	move	d7,-(sp)
+	DOS	_CLOSE			*'@IOCS'をクローズする
+	addq.l	#2,sp
+	moveq	#-1,d7			*(ファイルディスクリプタを無効にする)
 
-		andi	#$c03f,d1
-		cmpi	#$c020,d1	*(ｷｬﾗｸﾀﾃﾞﾊﾞｲｽ/IOCTRL可/RAW MODE)
-		bne	cmd_exec50	*装置情報が違う(IOCS.Xが登録済みの場合)
+	andi	#$c03f,d1
+	cmpi	#$c020,d1		*(ｷｬﾗｸﾀﾃﾞﾊﾞｲｽ/IOCTRL可/RAW MODE)
+	bne	cmd_exec50		*装置情報が違う(IOCS.Xが登録済みの場合)
 
-		move	#1,-(sp)	*今度は書き込みオープン
-		pea	(iocsname,pc)
-		DOS	_OPEN		*'@IOCS'を再度オープン
-		addq.l	#6,sp
-		move.l	d0,d7
-		bmi	cmd_exec50	*必ずオープンできるはずだが念のため
+	move	#1,-(sp)		*今度は書き込みオープン
+	pea	(iocsname,pc)
+	DOS	_OPEN			*'@IOCS'を再度オープン
+	addq.l	#6,sp
+	move.l	d0,d7
+	bmi	cmd_exec50		*必ずオープンできるはずだが念のため
 
-		pea	(IOCTRLSIZE).w
-	 	lea	(IOCTRLDATA,pc),a0	*	<+06
-	 	clr.l	(a0)
-	 	pea	(a0)
-		move	d7,-(sp)
-		move	#2,-(sp)
-		DOS	_IOCTRL		*現在のHIOCSパラメータを得る
-		lea	(12,sp),sp
+	pea	(IOCTRLSIZE).w
+ 	lea	(IOCTRLDATA,pc),a0	*	<+06
+ 	clr.l	(a0)
+ 	pea	(a0)
+	move	d7,-(sp)
+	move	#2,-(sp)
+	DOS	_IOCTRL			*現在のHIOCSパラメータを得る
+	lea	(12,sp),sp
 
-		lea	(IOCTRLDATA,pc),a0
-		lea	(checkstr,pc),a1
-		moveq	#16/4-1,d0
+	lea	(IOCTRLDATA,pc),a0
+	lea	(checkstr,pc),a1
+	moveq	#16/4-1,d0
 cmd_exec2:
-		cmpm.l	(a0)+,(a1)+	*バージョンチェック用文字列を比較する
-		dbne	d0,cmd_exec2
-		bne	vererr
+	cmpm.l	(a0)+,(a1)+		*バージョンチェック用文字列を比較する
+	dbne	d0,cmd_exec2
+	bne	vererr
 
-		move.b	(IOVECTFLG+~IOCSGRFLG,pc),d0
-		bne	cmd_exec4
+	move.b	(IOVECTFLG+~IOCSGRFLG,pc),d0
+	bne	cmd_exec4
 
 *(デバイスドライバ解除状態から復帰する場合)
-		lea	(IOVECTFLG,pc),a0
-		moveq	#VECTFLGSIZE-1,d0
+	lea	(IOVECTFLG,pc),a0
+	moveq	#VECTFLGSIZE-1,d0
 cmd_exec3:
-		st	(a0)+
-		dbra	d0,cmd_exec3
+	st	(a0)+
+	dbra	d0,cmd_exec3
 cmd_exec4:
-		bsr	cmd_param	*パラメータの解釈
-		bne	usage		*コマンドラインに誤りがある
+	bsr	cmd_param		*パラメータの解釈
+	bne	usage			*コマンドラインに誤りがある
 
-		move.b	(FLAG_M,pc),d0
-		bne	alrromerr	*-mスイッチがある	<+03
-		move.b	(FLAG_R,pc),d0
-		bne	cmd_rels	*-rスイッチがある
+	move.b	(FLAG_M,pc),d0
+	bne	alrromerr		*-mスイッチがある	<+03
+	move.b	(FLAG_R,pc),d0
+	bne	cmd_rels		*-rスイッチがある
 
-		bsr	ioctrl_write	*HIOCSパラメータを設定する
-		move.b	(FLAG_F,pc),d0
-		beq	@f
+	bsr	ioctrl_write		*HIOCSパラメータを設定する
+	move.b	(FLAG_F,pc),d0
+	beq	@f
 
-		move	(IOCTRLERR,pc),d0
-		bne	cmd_exec5	;ベクタが変更されている
-		PRINT	(initfont_msg,pc)
-		bsr	freeexbuf	;-f フォントの初期化
+	move	(IOCTRLERR,pc),d0
+	bne	cmd_exec5		;ベクタが変更されている
+	PRINT	(initfont_msg,pc)
+	bsr	freeexbuf		;-f フォントの初期化
 @@:
-		bsr	readfont_cmd
-		bmi	cmd_exec5
-		cmp.b	(FONTBUFSIZE,pc),d1
-		bhi	cmd_exec26
+	bsr	readfont_cmd
+	bmi	cmd_exec5
+	cmp.b	(FONTBUFSIZE,pc),d1
+	bhi	cmd_exec26
 
-		move.l	d2,-(sp)	*フォントバッファサイズが足りる場合
-		pea	(DATABUF,pc)
-		move	d7,-(sp)
-		DOS	_WRITE
-		lea	(10,sp),sp
+	move.l	d2,-(sp)		*フォントバッファサイズが足りる場合
+	pea	(DATABUF,pc)
+	move	d7,-(sp)
+	DOS	_WRITE
+	lea	(10,sp),sp
 cmd_exec5:
-		move	(IOCTRLERR,pc),d0
-		bne	vecterr		*ベクタが変更されている
-		bra	exit
+	move	(IOCTRLERR,pc),d0
+	bne	vecterr			*ベクタが変更されている
+	bra	exit
 
 * 既に常駐している状態でフォントバッファが足りない場合、プログラムの先頭に
 * フォント指定ルーチンを移動し、その直後にフォントを読み込んで常駐終了する.
 
 cmd_exec26:
-		bsr	freeexbuf
-		lea	(dev_header,pc),a1
-		lea	(ex_fontset9-ex_fontset,a1),a1
-		move.l	a1,(a0)+
-		move.b	d1,(a0)
+	bsr	freeexbuf
+	lea	(dev_header,pc),a1
+	lea	(ex_fontset9-ex_fontset,a1),a1
+	move.l	a1,(a0)+
+	move.b	d1,(a0)
 
-		bsr	ioctrl_write	*HIOCSパラメータを設定する
+	bsr	ioctrl_write		*HIOCSパラメータを設定する
 
-		lea	(ex_fontset,pc),a0
-		lea	(dev_header,pc),a1
-		move	#(ex_fontset9-ex_fontset+3)/4-1,d0
+	lea	(ex_fontset,pc),a0
+	lea	(dev_header,pc),a1
+	move	#(ex_fontset9-ex_fontset+3)/4-1,d0
 cmd_exec23:
-		move.l	(a0)+,(a1)+
-		dbra	d0,cmd_exec23
-		bsr	clear_mpu_cache
+	move.l	(a0)+,(a1)+
+	dbra	d0,cmd_exec23
+	bsr	clear_mpu_cache
 
-		lea	(DATABUF,pc),a0
-		lea	(dev_header,pc),a1
-		jmp	(ex_fontset1-ex_fontset,a1)
+	lea	(DATABUF,pc),a0
+	lea	(dev_header,pc),a1
+	jmp	(ex_fontset1-ex_fontset,a1)
 
 ioctrl_write:
-		pea	(IOCTRLSIZE).w
-		pea	(IOCTRLDATA,pc)
-		move	d7,-(sp)
-		move	#3,-(sp)
-		DOS	_IOCTRL		*HIOCSパラメータを設定する
-		lea	(12,sp),sp
-		rts
+	pea	(IOCTRLSIZE).w
+	pea	(IOCTRLDATA,pc)
+	move	d7,-(sp)
+	move	#3,-(sp)
+	DOS	_IOCTRL			*HIOCSパラメータを設定する
+	lea	(12,sp),sp
+	rts
 
 *	拡張フォントバッファがあれば開放する
 
 freeexbuf:
-		lea	(FONTBUFSIZE+1,pc),a0
-		move.b	(a0),-(a0)
-		move.l	-(a0),d0	*拡張フォントバッファ先頭アドレス
-		beq	freeexbuf9
+	lea	(FONTBUFSIZE+1,pc),a0
+	move.b	(a0),-(a0)
+	move.l	-(a0),d0		*拡張フォントバッファ先頭アドレス
+	beq	freeexbuf9
 
-		clr.l	(a0)
-		subi.l	#$f0+ex_fontset9-ex_fontset,d0
-		move.l	d0,-(sp)
-		DOS	_MFREE		*拡張フォントバッファを開放する
-*		addq.l	#4,sp
-*		tst.l	d0
-		move.l	d0,(sp)+
-		bmi	relserr		*メモリが開放できなかった
+	clr.l	(a0)
+	subi.l	#$f0+ex_fontset9-ex_fontset,d0
+	move.l	d0,-(sp)
+	DOS	_MFREE			*拡張フォントバッファを開放する
+*	addq.l	#4,sp
+*	tst.l	d0
+	move.l	d0,(sp)+
+	bmi	relserr			*メモリが開放できなかった
 
-		bsr	ioctrl_write
+	bsr	ioctrl_write
 freeexbuf9:
-		pea	(1)			*<+02
-		pea	(DATABUF,pc)
-		move	d7,-(sp)
-		DOS	_WRITE			*@IOCSにダミーデータ(1byte)を送る
-		lea	(10,sp),sp
-		rts
+	pea	(1)			*<+02
+	pea	(DATABUF,pc)
+	move	d7,-(sp)
+	DOS	_WRITE			*@IOCSにダミーデータ(1byte)を送る
+	lea	(10,sp),sp
+	rts
 
 
 *	拡張フォントバッファ設定ルーチン
 
 ex_fontset:
-		.dc.b	'HIOCS external font buffer'
-		.even
+	.dc.b	'HIOCS external font buffer'
+	.even
 ex_fontset1:
-		move.l	d2,-(sp)
-		lea	(ex_fontset9,pc),a1
-		move.l	a1,-(sp)
+	move.l	d2,-(sp)
+	lea	(ex_fontset9,pc),a1
+	move.l	a1,-(sp)
 ex_fontset2:
-		move.l	(a0)+,(a1)+
-		subq.l	#4,d2
-		bne	ex_fontset2
+	move.l	(a0)+,(a1)+
+	subq.l	#4,d2
+	bne	ex_fontset2
 
-*		move.l	d2,-(sp)
-*		pea	(ex_fontset9,pc)
-		move	d7,-(sp)
-		DOS	_WRITE			*フォントを設定する
-		DOS	_CLOSE			*'@IOCS'をクローズする
-		lea	(10,sp),sp
+*	move.l	d2,-(sp)
+*	pea	(ex_fontset9,pc)
+	move	d7,-(sp)
+	DOS	_WRITE			*フォントを設定する
+	DOS	_CLOSE			*'@IOCS'をクローズする
+	lea	(10,sp),sp
 
-		lea	(dev_header,pc),a0
-		suba.l	a0,a1
-		clr	-(sp)		*終了コード
-		move.l	a1,-(sp)	*常駐部サイズ
-		DOS	_KEEPPR		*常駐終了する
-		.quad
+	lea	(dev_header,pc),a0
+	suba.l	a0,a1
+	clr	-(sp)			*終了コード
+	move.l	a1,-(sp)		*常駐部サイズ
+	DOS	_KEEPPR			*常駐終了する
+	.quad
 ex_fontset9:
 
 
@@ -1433,7 +1433,7 @@ cmd_rels3:
 	cmpa.l	(_MS_PATST*4+$400),a2
 	bne	vecterr
 cmd_rels4:
-		bsr	ioctrl_write	*HIOCSパラメータを設定する
+	bsr	ioctrl_write		*HIOCSパラメータを設定する
 
 	move	(IOCTRLERR,pc),d0
 	bne	vecterr			*ベクタが変更されている
@@ -1473,29 +1473,29 @@ cmd_rels7:
 *	HIOCS.Xが組み込まれていない場合
 
 cmd_exec50:
-		lea	(IOVECTFLG,pc),a0
-		moveq	#VECTFLGSIZE-1,d0
+	lea	(IOVECTFLG,pc),a0
+	moveq	#VECTFLGSIZE-1,d0
 cmd_exec51:
-		st	(a0)+		*全ベクタを変更する(デフォルト)
-		dbra	d0,cmd_exec51
+	st	(a0)+			*全ベクタを変更する(デフォルト)
+	dbra	d0,cmd_exec51
 
-		bsr	mask_spurious		;スプリアス割り込みを無効化
+	bsr	mask_spurious		;スプリアス割り込みを無効化
 .if CPU==68000
-		bsr	rte_patch
+	bsr	rte_patch
 .endif
-		bsr	cmd_param	*パラメータの解釈
-		bne	usage		*コマンドラインに誤りがある
+	bsr	cmd_param		*パラメータの解釈
+	bne	usage			*コマンドラインに誤りがある
 
-		move.b	(FLAG_R,pc),d0
-		bne	nostayerr	*-rスイッチがある
-		move.b	(FLAG_M,pc),d0
-		bne	cmd_patch	*-mスイッチがある
+	move.b	(FLAG_R,pc),d0
+	bne	nostayerr		*-rスイッチがある
+	move.b	(FLAG_M,pc),d0
+	bne	cmd_patch		*-mスイッチがある
 
-		bsr	copyank8	*ＲＯＭフォントをＲＡＭに転送
-		bsr	readfont_cmd	*フォントファイルを読み込む
-		lea	(FONTBUFSIZE,pc),a0
-		move.b	d1,(a0)+
-		move.b	d1,(a0)
+	bsr	copyank8		*ＲＯＭフォントをＲＡＭに転送
+	bsr	readfont_cmd		*フォントファイルを読み込む
+	lea	(FONTBUFSIZE,pc),a0
+	move.b	d1,(a0)+
+	move.b	d1,(a0)
 
 	move.l	d1,-(sp)
 	lea	(TOPADR,pc),a1
@@ -1515,14 +1515,14 @@ cmd_exec52:
 	sf	(a1)+
 	dbra	d0,cmd_exec52
 
-		lea	(VECTFLG,pc),a0
-		lea	(IOVECTFLG,pc),a1
-		bsr	setvect		*ベクタを変更する
-		bsr	setundefchr	*未定義漢字コードを設定する
+	lea	(VECTFLG,pc),a0
+	lea	(IOVECTFLG,pc),a1
+	bsr	setvect			*ベクタを変更する
+	bsr	setundefchr		*未定義漢字コードを設定する
 
-		move.l	(sp)+,d1
-		moveq	#-1,d6
-		bra	dev_init9
+	move.l	(sp)+,d1
+	moveq	#-1,d6
+	bra	dev_init9
 relserr:				*メモリが開放できなかった
 	PRINT	(relserr_msg,pc)	*(メモリ管理ポインタの異常)
 relserr1:
@@ -1550,36 +1550,36 @@ mpuerr:
 .endif
 
 usage:					*使用法を表示して終了
-		bpl	@f
-		PRINT	(paramerr_msg,pc)
+	bpl	@f
+	PRINT	(paramerr_msg,pc)
 @@:
-		pea	(usage_msg,pc)
+	pea	(usage_msg,pc)
 errout:					*エラーを出力して終了する
-		DOS	_PRINT
-		addq.l	#4,sp
+	DOS	_PRINT
+	addq.l	#4,sp
 
-		bsr	close_iocs
-		move	#-1,-(sp)
-		DOS	_EXIT2
+	bsr	close_iocs
+	move	#-1,-(sp)
+	DOS	_EXIT2
 
 rels_exit:
-		PRINT	(rels_msg,pc)
+	PRINT	(rels_msg,pc)
 exit:
-		bsr	close_iocs
-		DOS	_EXIT
+	bsr	close_iocs
+	DOS	_EXIT
 
 close_iocs:
-		move	d7,-(sp)
-		bmi	@f
-		DOS	_CLOSE		*'@IOCS'がオープンされていたらクローズする
+	move	d7,-(sp)
+	bmi	@f
+	DOS	_CLOSE			*'@IOCS'がオープンされていたらクローズする
 @@:
-		addq.l	#2,sp
-		rts
+	addq.l	#2,sp
+	rts
 
 *	NULデバイスを検索し、リンクポインタの終端を探す
 
 sealink::
-		lea	($6800),a1
+	lea	($6800),a1
 sealink1:
 	cmpi	#'NU',(a1)+		*Human中から'NUL     'を探し出す
 	bne	sealink1
@@ -1598,34 +1598,34 @@ sealink2:
 *	-mスイッチの処理
 
 cmd_patch:				*<+03
-		bsr	rompatch1	*IOCS ROMへのパッチ当て
-		tst.l	d0
-		bne	alrromerr	*すでにパッチ済み
+	bsr	rompatch1		*IOCS ROMへのパッチ当て
+	tst.l	d0
+	bne	alrromerr		*すでにパッチ済み
 
-		PRINT	(rompat_msg,pc)
-		clr	-(sp)
-		pea	(patchend-dev_header).w
-		DOS	_KEEPPR		*常駐終了する
+	PRINT	(rompat_msg,pc)
+	clr	-(sp)
+	pea	(patchend-dev_header).w
+	DOS	_KEEPPR			*常駐終了する
 alrromerr:
-		pea	(alrrom_msg,pc)
-		bra	errout
+	pea	(alrrom_msg,pc)
+	bra	errout
 
 * 68000 なら move (sp)+,sr / rts を rte 一命令にする
 .if CPU==68000
 rte_patch:
-		tst.b	(MPUTYPE)
-		bne	rte_patch_skip		;68000 以外ならそのまま
+	tst.b	(MPUTYPE)
+	bne	rte_patch_skip		;68000 以外ならそのまま
 
-		move	#RTE,d0
-		lea	(os_curon_rte,pc),a0
-		move	d0,(a0)
-		move	d0, (mscdraw_rte-os_curon_rte,a0)
-		move	d0,(mscerase_rte-os_curon_rte,a0)
-		move	d0, (txyline_rte-os_curon_rte,a0)
-		move	d0,  (txline_rte-os_curon_rte,a0)
+	move	#RTE,d0
+	lea	(os_curon_rte,pc),a0
+	move	d0,(a0)
+	move	d0, (mscdraw_rte-os_curon_rte,a0)
+	move	d0,(mscerase_rte-os_curon_rte,a0)
+	move	d0, (txyline_rte-os_curon_rte,a0)
+	move	d0,  (txline_rte-os_curon_rte,a0)
 * キャッシュフラッシュは不要.
 rte_patch_skip:
-		rts
+	rts
 .endif
 
 
@@ -1701,8 +1701,8 @@ mspatch1:
 	move	d0,(a3)
 	bra	mspatch1
 mspatch9:
-		bra	clear_mpu_cache
-**		rts
+	bra	clear_mpu_cache
+**	rts
 
 msdpatchtbl:				*マウスカーソル表示処理を呼び出すアドレス
 	.dc	msdpatch1-msdpatchtbl
@@ -1717,380 +1717,380 @@ msepatchtbl:				*マウスカーソル消去処理を呼び出すアドレス
 *	スプリアス割り込みの無効化
 
 mask_spurious:
-		movem.l	d0/a0,-(sp)
-		move	#RTE,d0
-		movea.l	(SPURIVEC),a0
-		cmp	(a0),d0
-		beq	mask_spurious_end	;既に rte になっていたらそのまま
-		lea	($ff0000),a0
-@@:		cmp	(a0)+,d0		;ROM から rte を探す
-		bne	@b
-		subq.l	#2,a0
-		move.l	a0,(SPURIVEC)		;rte のアドレスを設定
+	movem.l	d0/a0,-(sp)
+	move	#RTE,d0
+	movea.l	(SPURIVEC),a0
+	cmp	(a0),d0
+	beq	mask_spurious_end	;既に rte になっていたらそのまま
+	lea	($ff0000),a0
+@@:	cmp	(a0)+,d0		;ROM から rte を探す
+	bne	@b
+	subq.l	#2,a0
+	move.l	a0,(SPURIVEC)		;rte のアドレスを設定
 mask_spurious_end:
-		movem.l	(sp)+,d0/a0
-		rts
+	movem.l	(sp)+,d0/a0
+	rts
 
 
 *	パラメータの解釈
 
 cmd_param:				*コマンドラインからパラメータリストを作る
-		pea	(1,a2)
-		bsr	GetArgCharInit
-		addq.l	#4,sp
-		bra	@f
+	pea	(1,a2)
+	bsr	GetArgCharInit
+	addq.l	#4,sp
+	bra	@f
 dev_param:				*デバイスドライバパラメータ解釈
-		tst.b	(a1)+
-		bne	dev_param
-		lea	(ArgPtr,pc),a0
-		move.l	a1,(a0)
-		st	(a0)
+	tst.b	(a1)+
+	bne	dev_param
+	lea	(ArgPtr,pc),a0
+	move.l	a1,(a0)
+	st	(a0)
 @@:
 param1:
-		bsr	GetArgChar
-		tst.l	d0
-		beq	param9
-		bmi	param1			;""
+	bsr	GetArgChar
+	tst.l	d0
+	beq	param9
+	bmi	param1			;""
 
-		moveq	#-1,d3		*-[スイッチ]
-		cmpi.b	#'-',d0
-		beq	param2
-		moveq	#0,d3		*+[スイッチ] …機能指定を反転させる
-		cmpi.b	#'+',d0
-		beq	param2
+	moveq	#-1,d3			*-[スイッチ]
+	cmpi.b	#'-',d0
+	beq	param2
+	moveq	#0,d3			*+[スイッチ] …機能指定を反転させる
+	cmpi.b	#'+',d0
+	beq	param2
 
-		moveq	#90-2,d1
+	moveq	#90-2,d1
 @@:
-		bsr	GetArgChar
-		tst.b	d0
-		dbeq	d1,@b
-		beq	param1
-		bra	param8			;ファイル名が長すぎる
+	bsr	GetArgChar
+	tst.b	d0
+	dbeq	d1,@b
+	beq	param1
+	bra	param8			;ファイル名が長すぎる
 param2:
-		bsr	GetArgChar
-		tst.b	d0
-		beq	param8			;-/+のみ
+	bsr	GetArgChar
+	tst.b	d0
+	beq	param8			;-/+のみ
 next_option:
-		tst.b	d0
-		beq	param1
-		cmpi.b	#'?',d0
-		beq	param_h
-		ori.b	#$20,d0
-		lea	(param_table-2,pc),a0
+	tst.b	d0
+	beq	param1
+	cmpi.b	#'?',d0
+	beq	param_h
+	ori.b	#$20,d0
+	lea	(param_table-2,pc),a0
 @@:
-		addq.l	#2,a0
-		move	(a0)+,d1
-		beq	param8
-		cmp.b	d0,d1
-		bne	@b
-		adda	(a0),a0
-		jmp	(a0)
+	addq.l	#2,a0
+	move	(a0)+,d1
+	beq	param8
+	cmp.b	d0,d1
+	bne	@b
+	adda	(a0),a0
+	jmp	(a0)
 param8:
-		moveq	#-1,d0		*パラメータの指定に誤りがある
-		rts
+	moveq	#-1,d0			*パラメータの指定に誤りがある
+	rts
 
 param_table:
-		.irpc	%a,cdefghjlmrsuv
-		.dc	'&%a',param_%a-$
-		.endm
-		.dc	0
+	.irpc	%a,cdefghjlmrsuv
+	.dc	'&%a',param_%a-$
+	.endm
+	.dc	0
 
 param_h:
-		moveq	#1,d0		*使用法表示
+	moveq	#1,d0			*使用法表示
 param9:
-		rts			;d0.l=0
+	rts				;d0.l=0
 
 param_d:				*-d[0/1]
-		lea	(IOVECTFLG+~DOSCONFLG,pc),a0
-		move.b	d3,(a0)
-		not.b	(a0)
-		bra	paramsw1
+	lea	(IOVECTFLG+~DOSCONFLG,pc),a0
+	move.b	d3,(a0)
+	not.b	(a0)
+	bra	paramsw1
 
 param_m:				*-m
-		bsr	GetArgChar
-		cmpi.b	#'s',d0
-		beq	param_ms
-		cmpi.b	#'S',d0
-		beq	param_ms
-		cmpi.b	#'h',d0
-		beq	param_mh
-		cmpi.b	#'H',d0
-		beq	param_mh
+	bsr	GetArgChar
+	cmpi.b	#'s',d0
+	beq	param_ms
+	cmpi.b	#'S',d0
+	beq	param_ms
+	cmpi.b	#'h',d0
+	beq	param_mh
+	cmpi.b	#'H',d0
+	beq	param_mh
 
-		lea	(FLAG_M,pc),a0
-		st	(a0)
-		bra	next_option
+	lea	(FLAG_M,pc),a0
+	st	(a0)
+	bra	next_option
 
 param_ms:				*-ms[0/1]	<+08
-		lea	(IOVECTFLG+~IOCSMSFLG,pc),a0
-		bsr	GetArgChar
-		cmpi.b	#'0',d0
-		bcs	param_ms2
-		beq	param_ms0
-		cmpi.b	#'4',d0
-		bhi	param_ms2
+	lea	(IOVECTFLG+~IOCSMSFLG,pc),a0
+	bsr	GetArgChar
+	cmpi.b	#'0',d0
+	bcs	param_ms2
+	beq	param_ms0
+	cmpi.b	#'4',d0
+	bhi	param_ms2
 
-		moveq	#'5',d1			;-ms1～-ms4 マウスカーソル移動速度の指定
-		sub	d0,d1
-		bsr	GetArgChar
+	moveq	#'5',d1			;-ms1～-ms4 マウスカーソル移動速度の指定
+	sub	d0,d1
+	bsr	GetArgChar
 param_ms1:
-		st	(a0)
-		lea	(MSSPEED,pc),a0
-		move	d1,(a0)			;1～4 → 4～1
-		bra	next_option
+	st	(a0)
+	lea	(MSSPEED,pc),a0
+	move	d1,(a0)			;1～4 → 4～1
+	bra	next_option
 param_ms2:
-		moveq	#3,d1
-		tst.b	d3
-		bne	param_ms1		;-ms = -ms2
+	moveq	#3,d1
+	tst.b	d3
+	bne	param_ms1		;-ms = -ms2
 
-		st	(a0)			;+ms フックのみ
-		bra	next_option
+	st	(a0)			;+ms フックのみ
+	bra	next_option
 param_ms0:
-		sf	(a0)			;-ms0 ROMに戻す
-		bra	paramsw9
+	sf	(a0)			;-ms0 ROMに戻す
+	bra	paramsw9
 
-param_mh:					;-mh[0/1]
-		moveq	#$1f,d2			;5MHz
-		bsr	check_param01
-		beq	@f
-		moveq	#$2f,d2			;7.5MHz
+param_mh:				;-mh[0/1]
+	moveq	#$1f,d2			;5MHz
+	bsr	check_param01
+	beq	@f
+	moveq	#$2f,d2			;7.5MHz
 @@:
-		move	sr,-(sp)
-		ori	#$700,sr
-		lea	(_SCCCMD_B),a0
-		tst.b	(a0)			;空読み
-		moveq	#14,d1
-		move.b	d1,(a0)
-		move.b	#%000_0001_0,(a0)	;ボーレートジェネレータ停止
+	move	sr,-(sp)
+	ori	#$700,sr
+	lea	(_SCCCMD_B),a0
+	tst.b	(a0)			;空読み
+	moveq	#14,d1
+	move.b	d1,(a0)
+	move.b	#%000_0001_0,(a0)	;ボーレートジェネレータ停止
 
-		move.b	#12,(a0)
-		move.b	d2,(a0)			;tc(下位)
-		lsr	#8,d2
-		move.b	#13,(a0)
-		move.b	d2,(a0)			;tc(上位)
+	move.b	#12,(a0)
+	move.b	d2,(a0)			;tc(下位)
+	lsr	#8,d2
+	move.b	#13,(a0)
+	move.b	d2,(a0)			;tc(上位)
 
-		move.b	d1,(a0)
-		move.b	#%000_0001_1,(a0)	;ボーレートジェネレータ動作
-		move	(sp)+,sr
-		bra	next_option
+	move.b	d1,(a0)
+	move.b	#%000_0001_1,(a0)	;ボーレートジェネレータ動作
+	move	(sp)+,sr
+	bra	next_option
 
 
 * -x -x1 +x0	d1.b = -1
 * +x -x0 +x1	d1.b =  0
 check_param01:
-		move.b	d3,d1
-		bsr	GetArgChar
-		cmpi.b	#'1',d0
-		beq	@f			;-x=-x1、+x=+x1
-		cmpi.b	#'0',d0
-		bne	9f
-		not.b	d1			;-x0=+x、+x0=-x
-@@:		bsr	GetArgChar
-9:		tst.b	d1
-		rts
+	move.b	d3,d1
+	bsr	GetArgChar
+	cmpi.b	#'1',d0
+	beq	@f			;-x=-x1、+x=+x1
+	cmpi.b	#'0',d0
+	bne	9f
+	not.b	d1			;-x0=+x、+x0=-x
+@@:	bsr	GetArgChar
+9:	tst.b	d1
+	rts
 
 
 param_g:				*-g[0/1]
-		bsr	check_param01
-		lea	(IOVECTFLG+~IOCSCONFLG,pc),a0
-		move.b	d1,(a0)			;IOCSCONFLG
-		addq.l	#~DOSCONFLG-~IOCSCONFLG,a0
-		move.b	d1,(a0)+		;DOSCONFLG
-		move.b	d1,(a0)			;IOCSMSFLG
-		bra	next_option
+	bsr	check_param01
+	lea	(IOVECTFLG+~IOCSCONFLG,pc),a0
+	move.b	d1,(a0)			;IOCSCONFLG
+	addq.l	#~DOSCONFLG-~IOCSCONFLG,a0
+	move.b	d1,(a0)+		;DOSCONFLG
+	move.b	d1,(a0)			;IOCSMSFLG
+	bra	next_option
 
 param_r:				*-r
-		lea	(FLAG_R,pc),a0
-		bra	paramset
+	lea	(FLAG_R,pc),a0
+	bra	paramset
 param_f:				*-f
-		lea	(FLAG_F,pc),a0
-		bra	paramset
+	lea	(FLAG_F,pc),a0
+	bra	paramset
 paramset:
-		st	(a0)
+	st	(a0)
 paramsw9:
-		bsr	GetArgChar
-		bra	next_option
+	bsr	GetArgChar
+	bra	next_option
 
 param_j:				*-j
-		lea	(flagjctrl,pc),a0
-		move	#-1,(a0)
-		bra	paramsw9
+	lea	(flagjctrl,pc),a0
+	move	#-1,(a0)
+	bra	paramsw9
 
 param_e:
-		lea	(CONESCFLG,pc),a0
-		bra	paramsw
+	lea	(CONESCFLG,pc),a0
+	bra	paramsw
 param_l:
-		lea	(USRKNJ2FLG,pc),a0
-		bra	paramsw
+	lea	(USRKNJ2FLG,pc),a0
+	bra	paramsw
 param_s:
-		lea	(CHRSELFLG,pc),a0
-		bra	paramsw
+	lea	(CHRSELFLG,pc),a0
+	bra	paramsw
 param_v:
-		lea	(VBELLFLG,pc),a0
-		bra	paramsw
+	lea	(VBELLFLG,pc),a0
+	bra	paramsw
 paramsw:
-		move.b	d3,(a0)
+	move.b	d3,(a0)
 paramsw1:
-		bsr	GetArgChar
+	bsr	GetArgChar
 paramsw2:
-		cmpi.b	#'1',d0
-		beq	paramsw9
-		cmpi.b	#'0',d0
-		bne	next_option
+	cmpi.b	#'1',d0
+	beq	paramsw9
+	cmpi.b	#'0',d0
+	bne	next_option
 
-		not.b	(a0)
-		bra	paramsw9
+	not.b	(a0)
+	bra	paramsw9
 
 param_u:				*-u[0/1/2]	<+07
-		lea	(USRKNJFLG,pc),a0
-		move.b	d3,(a0)
-		bsr	GetArgChar
-		cmpi.b	#'2',d0
-		bne	paramsw2
+	lea	(USRKNJFLG,pc),a0
+	move.b	d3,(a0)
+	bsr	GetArgChar
+	cmpi.b	#'2',d0
+	bne	paramsw2
 
-		move.b	#1,(a0)			;-u2
-		bra	paramsw9
+	move.b	#1,(a0)			;-u2
+	bra	paramsw9
 
 param_c:
-		lea	(UNDEFFLG,pc),a0
-		lea	(UNDEFPAT,pc),a2
-		bsr	GetArgChar
-		tst.b	d0
-		spl	(a0)
-		beq	param_c2
-		bpl	param_c1
+	lea	(UNDEFFLG,pc),a0
+	lea	(UNDEFPAT,pc),a2
+	bsr	GetArgChar
+	tst.b	d0
+	spl	(a0)
+	beq	param_c2
+	bpl	param_c1
 
-		lea	(UNDEFCHR,pc),a0	;-c字
-		move.b	d0,(a0)+
-		bsr	GetArgChar
-		move.b	d0,(a0)+
-		beq	param1
-		bra	paramsw9
+	lea	(UNDEFCHR,pc),a0	;-c字
+	move.b	d0,(a0)+
+	bsr	GetArgChar
+	move.b	d0,(a0)+
+	beq	param1
+	bra	paramsw9
 param_c1:				*-c[pattern..]
-		moveq	#32-1,d2
+	moveq	#32-1,d2
 @@:
-		bsr	gethex
-		bmi	next_option
+	bsr	gethex
+	bmi	next_option
 
-		move.b	d1,(a2)+
-		dbra	d2,param_c1
-		st	(a0)
-		bra	paramsw9
+	move.b	d1,(a2)+
+	dbra	d2,param_c1
+	st	(a0)
+	bra	paramsw9
 param_c2:
-		move.l	#$aaaa_5555,d0		;-c メッシュ
-		moveq	#8-1,d1
+	move.l	#$aaaa_5555,d0		;-c メッシュ
+	moveq	#8-1,d1
 param_c3:
-		move.l	d0,(a2)+
-		dbra	d1,param_c3
-		bra	param1
+	move.l	d0,(a2)+
+	dbra	d1,param_c3
+	bra	param1
 
 gethex:
-		bsr	getahex
-		bmi	@f
-		move.b	d0,d1
-		lsl.b	#4,d1
-		bsr	getahex
-		bmi	@f
-		or.b	d0,d1
-		moveq	#0,d0
+	bsr	getahex
+	bmi	@f
+	move.b	d0,d1
+	lsl.b	#4,d1
+	bsr	getahex
+	bmi	@f
+	or.b	d0,d1
+	moveq	#0,d0
 @@:
-		rts
+	rts
 getahex:
-		bsr	GetArgChar
-		cmpi.b	#'0',d0
-		bcs	getahex9
-		cmpi.b	#'9',d0
-		bls	getahex1		;0-9
+	bsr	GetArgChar
+	cmpi.b	#'0',d0
+	bcs	getahex9
+	cmpi.b	#'9',d0
+	bls	getahex1		;0-9
 
-		cmpi.b	#'_',d0
-		beq	getahex
+	cmpi.b	#'_',d0
+	beq	getahex
 
-		cmpi.b	#'A',d0
-		bcs	getahex9
-		cmpi.b	#'F',d0
-		bls	getahex2
+	cmpi.b	#'A',d0
+	bcs	getahex9
+	cmpi.b	#'F',d0
+	bls	getahex2
 
-		cmpi.b	#'a',d0
-		bcs	getahex9
-		cmpi.b	#'f',d0
-		bhi	getahex9
+	cmpi.b	#'a',d0
+	bcs	getahex9
+	cmpi.b	#'f',d0
+	bhi	getahex9
 
-		andi.b	#$df,d0
+	andi.b	#$df,d0
 getahex2:
-		subq.b	#'A'-('9'+1),d0		;a-fA-F
+	subq.b	#'A'-('9'+1),d0		;a-fA-F
 getahex1:
-		sub.b	#'0',d0
-		rts
+	sub.b	#'0',d0
+	rts
 getahex9:
-		moveq	#-1,d1
-		rts
+	moveq	#-1,d1
+	rts
 
 * HUPAIRデコード ------------------------------ *
 
 GetArgChar:
-		movem.l	d1/a0-a1,-(sp)
-		moveq	#0,d0
-		lea	(ArgPtr,pc),a0
-		movea.l	(a0),a1
-		move.b	(a0),d1
-		bpl	GetArgChar_next
+	movem.l	d1/a0-a1,-(sp)
+	moveq	#0,d0
+	lea	(ArgPtr,pc),a0
+	movea.l	(a0),a1
+	move.b	(a0),d1
+	bpl	GetArgChar_next
 
-		move.b	(a1)+,d0
-		bne	GetArgChar_end
-		tst.b	(a1)
-		bne	GetArgChar_abort2
-		subq.l	#1,a1
-		bra	GetArgChar_end
+	move.b	(a1)+,d0
+	bne	GetArgChar_end
+	tst.b	(a1)
+	bne	GetArgChar_abort2
+	subq.l	#1,a1
+	bra	GetArgChar_end
 GetArgChar_next:
-		move.b	(a1)+,d0
-		beq	GetArgChar_abort
-		tst.b	d1
-		bne	GetArgChar_inquate
-		cmpi.b	#' ',d0
-		beq	GetArgChar_separate
-		cmpi.b	#"'",d0
-		beq	GetArgChar_quate
-		cmpi.b	#'"',d0
-		bne	GetArgChar_end
+	move.b	(a1)+,d0
+	beq	GetArgChar_abort
+	tst.b	d1
+	bne	GetArgChar_inquate
+	cmpi.b	#' ',d0
+	beq	GetArgChar_separate
+	cmpi.b	#"'",d0
+	beq	GetArgChar_quate
+	cmpi.b	#'"',d0
+	bne	GetArgChar_end
 GetArgChar_quate:
-		move.b	d0,d1
-		bra	GetArgChar_next
+	move.b	d0,d1
+	bra	GetArgChar_next
 GetArgChar_end:
-		move.l	a1,(a0)
-		move.b	d1,(a0)
+	move.l	a1,(a0)
+	move.b	d1,(a0)
 GetArgChar_abort:
-		movem.l	(sp)+,d1/a0-a1
-		rts
+	movem.l	(sp)+,d1/a0-a1
+	rts
 GetArgChar_inquate:
-		cmp.b	d0,d1
-		bne	GetArgChar_end
-		clr.b	d1
-		bra	GetArgChar_next
+	cmp.b	d0,d1
+	bne	GetArgChar_end
+	clr.b	d1
+	bra	GetArgChar_next
 GetArgChar_separate:
-		cmp.b	(a1)+,d0
-		beq	GetArgChar_separate
-		subq.l	#1,a1
+	cmp.b	(a1)+,d0
+	beq	GetArgChar_separate
+	subq.l	#1,a1
 GetArgChar_abort2:
-		moveq	#1,d0
-		ror.l	#1,d0
-		bra	GetArgChar_end
+	moveq	#1,d0
+	ror.l	#1,d0
+	bra	GetArgChar_end
 
 GetArgCharInit:
-		movem.l	a0-a1,-(sp)
-		movea.l	(12,sp),a1
+	movem.l	a0-a1,-(sp)
+	movea.l	(12,sp),a1
 GetArgCharInit_skip:
-		cmpi.b	#' ',(a1)+
-		beq	GetArgCharInit_skip
-		subq.l	#1,a1
-		lea	(ArgPtr,pc),a0
-		move.l	a1,(a0)
-		movem.l	(sp)+,a0-a1
-		rts
+	cmpi.b	#' ',(a1)+
+	beq	GetArgCharInit_skip
+	subq.l	#1,a1
+	lea	(ArgPtr,pc),a0
+	move.l	a1,(a0)
+	movem.l	(sp)+,a0-a1
+	rts
 
 * Data Section -------------------------------- *
 *	メッセージデータ
 
-		.data
+	.data
 iocsname:	.dc.b	'@IOCS',0
 
 title_msg:	.dc.b	CR,LF
@@ -2153,8 +2153,8 @@ rompat_msg:	.dc.b	'IOCS ROMにパッチ当てを行ないました.',CR,LF,0
 
 * Block Storage Section -------------- *
 
-		.bss
-		.even
+	.bss
+	.even
 
 ArgPtr:		.ds.l	1
 
@@ -2167,12 +2167,12 @@ FLAG_DEV:	.ds.b	1		*デバイスドライバ起動フラグ
 
 VECTFLG:	.ds.b	VECTFLGSIZE
 
-		.even
+	.even
 filename_buf:	.ds.b	90
 DATABUF:	.ds.b	$1000		*雑用データバッファ
 
 
-		.end	cmd_exec
+	.end	cmd_exec
 
 * End of File ------------------------- *
 

@@ -1,6 +1,6 @@
-		.nlist
+	.nlist
 
-*		.title	HIOCS PLUS (hiocs.equ)
+*	.title	HIOCS PLUS (hiocs.equ)
 
 *****************************************************************
 *	HIOCS version 1.10+16
@@ -20,42 +20,42 @@ date:		.reg	'2022-06-20'
 
 * Target MPU -------------------------- *
 
-		.ifndef	CPU
-CPU:		.equ	68000
-		.endif
+.ifndef	CPU
+CPU:	.equ	68000
+.endif
 
-		.ifndef	UNROLL
-		.if	CPU>=68020
-UNROLL:		.equ	0
-		.else
-UNROLL:		.equ	1
-		.endif
-		.endif
+.ifndef	UNROLL
+	.if	CPU>=68020
+	UNROLL:	.equ	0
+	.else
+	UNROLL:	.equ	1
+	.endif
+.endif
 
 
-		.if	CPU==68000
+.if	CPU==68000
 HIOCS_ID:	.reg	'HIOCS PLUS '
-		.elseif	CPU==68030
+.elseif	CPU==68030
 HIOCS_ID:	.reg	'HIOCS P030 '
-		.else
-		.fail	1
-		.endif
+.else
+	.fail	1
+.endif
 
-		.cpu	CPU
+	.cpu	CPU
 
 
 * Fixed Number ------------------------ *
 
-CR:		.equ	13
-LF:		.equ	10
+CR:	.equ	13
+LF:	.equ	10
 
 * 680x0 命令コード -------------------- *
 
-RTE:		.equ	$4e73
-RTS:		.equ	$4e75
-MOVEM:		.equ	$48e7
-BRA_W:		.equ	$6000
-BNE_W:		.equ	$6600
+RTE:	.equ	$4e73
+RTS:	.equ	$4e75
+MOVEM:	.equ	$48e7
+BRA_W:	.equ	$6000
+BNE_W:	.equ	$6600
 
 *=======================================*
 *	ＣＰＵベクタ			*
@@ -261,4 +261,4 @@ fon_knj24:	.equ	$f40000	*24×24 全角フォント
 * Initial revision
 * 
 
-		.list
+	.list

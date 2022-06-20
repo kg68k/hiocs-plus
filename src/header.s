@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (header.s)
+	.title	HIOCS PLUS (header.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,25 +11,25 @@
 
 * Global Symbols --------------------- *
 
-		.xref	dev_strtgy,dev_intrpt
+	.xref	dev_strtgy,dev_intrpt
 
 
 * Text Section ----------------------- *
 
-		.text
+	.text
 
 *****************************************
 *	デバイスヘッダ			*
 *****************************************
 
 dev_header::
-		.dc.l	-1		*リンクポインタ
-		.dc	$c020		*属性(ｷｬﾗｸﾀﾃﾞﾊﾞｲｽ/IOCTRL可/RAW MODE)
-		.dc.l	dev_strtgy	*ストラテジルーチンエントリ
-		.dc.l	dev_intrpt	*割り込みルーチンエントリ
-		.dc.b	'@IOCS   '	*デバイス名
+	.dc.l	-1			*リンクポインタ
+	.dc	$c020			*属性(ｷｬﾗｸﾀﾃﾞﾊﾞｲｽ/IOCTRL可/RAW MODE)
+	.dc.l	dev_strtgy		*ストラテジルーチンエントリ
+	.dc.l	dev_intrpt		*割り込みルーチンエントリ
+	.dc.b	'@IOCS   '		*デバイス名
 
-		.end
+	.end
 
 * End of File ------------------------ *
 

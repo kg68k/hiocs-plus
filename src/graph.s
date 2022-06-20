@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (graph.s)
+	.title	HIOCS PLUS (graph.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,13 +11,13 @@
 
 * Include Files ----------------------- *
 
-		.include	iocscall.mac
-		.include	hiocs.equ
+	.include	iocscall.mac
+	.include	hiocs.equ
 
 
 * Text Section ------------------------ *
 
-		.text
+	.text
 
 *****************************************
 *	IOCS $d3	_TXXLINE	*
@@ -424,8 +424,8 @@ txylpat_start:
 L001a6c:
 	clr.w	(a3)
 txyline_rte::
-		move	(sp)+,sr	*割り込み禁止解除
-		rts
+	move	(sp)+,sr		*割り込み禁止解除
+	rts
 
 *****************************************
 *	IOCS $d6	_TXBOX		*
@@ -831,8 +831,8 @@ L001b8a:
 L001b90:
 	clr.w	(a3)
 txline_rte::
-		move	(sp)+,sr	*割り込み禁止解除
-		rts
+	move	(sp)+,sr		*割り込み禁止解除
+	rts
 
 *	dx<=dyの直線を描く
 
@@ -867,13 +867,13 @@ L001bbc:
 *****************************************
 
 drawmode::
-		move	(DRAWMODE),d0
-		cmpi	#-1,d1
-		beq	L001d92
+	move	(DRAWMODE),d0
+	cmpi	#-1,d1
+	beq	L001d92
 
-		move	d1,(DRAWMODE)
+	move	d1,(DRAWMODE)
 L001d92:
-		rts
+	rts
 
 *****************************************
 *	IOCS $b9	_BOX		*
@@ -2871,7 +2871,7 @@ L002df6:				*1024×1024 xorモード
 	jmp	(a0)
 	jmp	(a0)
 
-		.end
+	.end
 
 * End of File ------------------------- *
 

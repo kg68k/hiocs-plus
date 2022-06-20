@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (mouse.s)
+	.title	HIOCS PLUS (mouse.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,16 +11,16 @@
 
 * Global Symbols --------------------- *
 
-		.xref	MSSPEED
-		.xref	old_ms_init
+	.xref	MSSPEED
+	.xref	old_ms_init
 
 * Include Files ---------------------- *
 
-		.include	hiocs.equ
+	.include	hiocs.equ
 
 * Text Section ----------------------- *
 
-		.text
+	.text
 
 *************************************************
 *	マウスデータ送信要求処理ルーチン(10ms)	*
@@ -43,8 +43,8 @@ msctrlsetA::
 	tst.b	(a0)
 	tst.b	(a0)
 	tst.b	(a0)
-		move.b	#$05,(_SCCCMD_B-_SCCDATA_B,a0)	*WR5
-		move.b	#$62,(_SCCCMD_B-_SCCDATA_B,a0)	*RTS=L(本体側マウス送信要求)
+	move.b	#$05,(_SCCCMD_B-_SCCDATA_B,a0)	*WR5
+	move.b	#$62,(_SCCCMD_B-_SCCDATA_B,a0)	*RTS=L(本体側マウス送信要求)
 	move.l	(sp)+,a0
 	move.b	#$04,MSCTRLFLG.w	*次に送信要求を下ろすことにする
 	rts				*(データが来ない場合は割り込み４回分まで待つ)
@@ -168,8 +168,8 @@ sccbrcv9:
 
 sccbrcv1:
 	move	#3,MSRCVCNT.w		*受信カウンタ初期化
-**		lea	MSRCVBUF.w,a1
-		subq.l	#3,a1
+**	lea	MSRCVBUF.w,a1
+	subq.l	#3,a1
 	move.l	a1,MSRCVPTR.w		*受信バッファポインタ初期化
 .if CPU>=68020
 	tst.b	MSJOBFLG.w
@@ -183,13 +183,13 @@ sccbrcv1:
 	movea.l	a1,a0			*lea MSRCVBUF.w,a0
 	lea	MSRCVDATA.w,a1
 .if CPU>=68020
-		move	(a0)+,(a1)
-		move.b	(a0)+,(2,a1)
+	move	(a0)+,(a1)
+	move.b	(a0)+,(2,a1)
 .else
-		move.b	(a0)+,(a1)+
-		move.b	(a0)+,(a1)+
-		move.b	(a0)+,(a1)+
-		subq.l	#3,a1		*lea MSRCVDATA.w,a1
+	move.b	(a0)+,(a1)+
+	move.b	(a0)+,(a1)+
+	move.b	(a0)+,(a1)+
+	subq.l	#3,a1			*lea MSRCVDATA.w,a1
 .endif
 	move.b	#$38,_SCCCMD_B		*下位割り込み要求許可
 	move	4*4(sp),d0		*スタック上のsr
@@ -342,14 +342,14 @@ mscmove:
 
 	clr	MSASCNT.w
 	addq	#1,MSAPATN.w		*次のパターンデータのアドレスを得る
-		move	(MSAPATN),d1
+	move	(MSAPATN),d1
 .if CPU>=68020
-		tst	(MSCSRPAT,d1.w*4)
+	tst	(MSCSRPAT,d1.w*4)
 .else
-		lea	(MSCSRPAT),a0
-		add	d1,d1
-		add	d1,d1
-		tst	(a0,d1.w)	*パターンアドレスが存在するか？
+	lea	(MSCSRPAT),a0
+	add	d1,d1
+	add	d1,d1
+	tst	(a0,d1.w)		*パターンアドレスが存在するか？
 .endif
 	bne	mscmove2
 	clr	MSAPATN.w		*最初のパターンに戻る
@@ -452,14 +452,14 @@ mscdrawA::
 	movea.l	MSTXADR3.w,a1
 	lea	MSSAVE2.w,a2
 	lea	MSSAVE3.w,a3
-		move	(MSAPATN),d1	*マウスカーソルパターン番号
+	move	(MSAPATN),d1		*マウスカーソルパターン番号
 .if CPU>=68020
-		movea.l	(MSCSRPAT,d1.w*4),a4
+	movea.l	(MSCSRPAT,d1.w*4),a4
 .else
-		lea	(MSCSRPAT),a4
-		add	d1,d1
-		add	d1,d1
-		movea.l	(a4,d1.w),a4	*パターンデータアドレス
+	lea	(MSCSRPAT),a4
+	add	d1,d1
+	add	d1,d1
+	movea.l	(a4,d1.w),a4		*パターンデータアドレス
 .endif
 	lea	$0020(a4),a5
 
@@ -635,11 +635,11 @@ mscdrawA50:				*Ｘ座標が８の倍数でない場合
 .endif
 					*偶数アドレスの場合	llmm rr00
 .if CPU>=68020
-		move	(msevenmask1,pc,d0.w*2),d4
+	move	(msevenmask1,pc,d0.w*2),d4
 .else
-		move	d0,d4
-		add	d4,d4
-		move	(msevenmask1,pc,d4.w),d4	*左ワードマスクデータ
+	move	d0,d4
+	add	d4,d4
+	move	(msevenmask1,pc,d4.w),d4	*左ワードマスクデータ
 .endif
 	move	d4,d5
 	not	d5			*右ワード
@@ -766,8 +766,8 @@ mscdrawA99:
 	move	(sp)+,(a6)
 	move	(sp)+,_CRTC21-_CRTC23(a6)
 mscdraw_rte::
-		move	(sp)+,sr
-		rts
+	move	(sp)+,sr
+	rts
 
 
 *	マウスカーソルを消去する（v1.0ＲＯＭ対応）
@@ -907,11 +907,11 @@ msceraseA50:				*Ｘ座標が８の倍数でない場合
 .endif
 					*偶数アドレスの場合	llmm rr00
 .if CPU>=68020
-		move	(msevenmask2,pc,d0.w*2),d4
+	move	(msevenmask2,pc,d0.w*2),d4
 .else
-		move	d0,d4
-		add	d4,d4
-		move	(msevenmask2,pc,d4.w),d4	*左ワードマスクデータ
+	move	d0,d4
+	add	d4,d4
+	move	(msevenmask2,pc,d4.w),d4	*左ワードマスクデータ
 .endif
 	move	d4,d5
 	not	d5			*右ワード
@@ -1016,8 +1016,8 @@ msceraseA99:
 	move	(sp)+,(a6)
 	move	(sp)+,_CRTC21-_CRTC23(a6)
 mscerase_rte::
-		move	(sp)+,sr
-		rts
+	move	(sp)+,sr
+	rts
 
 
 *	マウスカーソルを描画する（v1.1ＲＯＭ以降対応）
@@ -1081,14 +1081,14 @@ mscdrawB6:				*ＶＲＡＭからデータを退避する
 	dbra	d3,mscdrawB6
 
 mscdrawB10:
-		move	(MSAPATN),d2	*マウスカーソルパターン番号
+	move	(MSAPATN),d2	*マウスカーソルパターン番号
 .if CPU>=68020
-		movea.l	(MSCSRPAT,d2.w*4),a2
+	movea.l	(MSCSRPAT,d2.w*4),a2
 .else
-		lea	(MSCSRPAT),a0
-		add	d2,d2
-		add	d2,d2
-		movea.l	(a0,d2.w),a2	*パターンデータアドレス
+	lea	(MSCSRPAT),a0
+	add	d2,d2
+	add	d2,d2
+	movea.l	(a0,d2.w),a2	*パターンデータアドレス
 .endif
 	movea.l	MSTXADR2.w,a0
 	movea.l	MSTXADR3.w,a1
@@ -1293,15 +1293,15 @@ ms_vcs1:				*パラメータをデフォルト値にする
 *****************************************
 
 ms_vcs::
-		tst.l	d1
-		beq	ms_vcs1
+	tst.l	d1
+	beq	ms_vcs1
 
-		move.l	d1,(MSCSRVECT)	*マウス受信データ処理アドレス
-		move	d2,(MSTINIT)
-		move	d2,(MSTIMER)
-		rts
+	move.l	d1,(MSCSRVECT)		*マウス受信データ処理アドレス
+	move	d2,(MSTINIT)
+	move	d2,(MSTIMER)
+	rts
 
-		.end
+	.end
 
 * End of File ------------------------ *
 

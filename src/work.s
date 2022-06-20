@@ -1,4 +1,4 @@
-		.title	HIOCS PLUS (work.s)
+	.title	HIOCS PLUS (work.s)
 
 *****************************************************************
 *	HIOCS version 1.10
@@ -11,12 +11,12 @@
 
 * Include Files ----------------------- *
 
-		.include	hiocs.equ
+	.include	hiocs.equ
 
 * Text Section ------------------------ *
 
-		.text
-		.quad
+	.text
+	.quad
 
 *=======================================*
 *	ワークエリア			*
@@ -55,7 +55,7 @@ LOGBUFVECT::	.ds.l	1	*CONDRV.SYSのバックログ処理アドレス
 CONDFLAG::	.ds.l	1	*CONDRV.SYSのオプションフラグのアドレス
 CONDSYSCALL::	.ds.l	1	*CONDRV.SYSのシステムコールのアドレス
 
-		.end
+	.end
 
 * End of File ------------------------- *
 
