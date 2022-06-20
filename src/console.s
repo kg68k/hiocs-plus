@@ -218,7 +218,7 @@ putmes_kanji2:
 	rts
 putmes_kanji3:
 	moveq	#0,d4
-	beq	b_putmes4
+	bra	b_putmes4
 
 putmes_hkanji:				*半角非漢字	<+07
 	beq	putmes_hkanji1
@@ -439,12 +439,16 @@ putc_log::
 	cmpi	#$0100,d1
 	bcc.s	putc_log3		*２バイト文字
 putc_log0:
+	lea	(chrtable,pc),a3
+.if CPU>=68020
+	lea	(a3,d1.w*sizeof_CHRTABLE),a0
+.else
 	move	d1,d2
 	lsl	#3,d2
-	lea	(chrtable,pc),a3
 	lea	(a3,d2.w),a0
-	move	(a0)+,d2		*~jobadr
-	tst.b	(~jisflag-2,a0)
+.endif
+	move	(a0)+,d2
+	tst.b	(~jisflag-~fntadr,a0)
 	bgt	@f
 	jsr	(a2)			*!(mi or eq)
 @@:
@@ -452,15 +456,16 @@ putc_log0:
 
 putc_log1:				*文字コードの続き
 	bpl	putc_log2
-	clr.b	(FIRSTBYTE)		*<+02 fixed from here
 .if CPU>=68020
-		lsl	#8,d0
+	lsl	#8,d0
 .else
-		move.b	d0,-(sp)
-		move	(sp)+,d0
+	move	(FIRSTBYTE),d0
 .endif
 	move.b	d1,d0
 	move	d0,d1
+	moveq	#0,d0			*condrvの仕様上、ESCシーケンス中でないときはd0.b!=$1bにする。
+					*FIRSTBYTE==$80,d1.w==$1bのとき、d0.bに$1bが残らないように注意。
+	move.b	d0,(FIRSTBYTE)
 	jsr	(a2)
 	cmpi.l	#fntadr,(_FNTADR*4+$400)	*IOCS _FNTADRは内部ルーチンか？
 	beq	putc_2bA		*２バイト文字の２バイト目	<+03
@@ -487,9 +492,9 @@ putc_log5:				*IOCS _FNTADRのベクタが変更されている場合
 	tst.b	(chrtable+~jisflag,pc,d1.w*8)
 .else
 	move	d1,d0
-	lsl	#3,d0
+	lsl	#3,d0			*d0.b!=$1bなのでcondrv対策のクリアは不要
 	LEA_CHRTABLE $00,~jisflag,a3
-	move.b	(a3,d0.w),d0
+	tst.b	(a3,d0.w)
 .endif
 	ble.s	putc_log4		*mi or eq
 	move.b	d1,(FIRSTBYTE)		*２バイト文字の１バイト目
