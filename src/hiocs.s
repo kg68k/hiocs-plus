@@ -1029,8 +1029,10 @@ dev_init2:
 dev_init_err:				*初期化時のエラー
 		pea	(paramerr_msg,pc)
 		bra	@f
+.if CPU==68030
 dev_init_err_mpu:
 		pea	(mpu_err_msg,pc)
+.endif
 @@:
 		DOS	_PRINT
 		addq.l	#4,sp
@@ -1541,9 +1543,11 @@ nostayerr:				*常駐していない
 vecterr:				*ベクタが変更されている
 	pea	(vecterr_msg,pc)
 	bra	errout
+.if CPU==68030
 mpuerr:
-		pea	(mpu_err_msg,pc)
-		bra	errout
+	pea	(mpu_err_msg,pc)
+	bra	errout
+.endif
 
 usage:					*使用法を表示して終了
 		bpl	@f
@@ -2094,11 +2098,14 @@ title_msg_2:	.dc.b	program
 .if CPU==68030
 		.dc.b	' for X68030'
 .endif
-		.dc.b	' version ',version,' (C)1990-95 SHARP / Y.Nakamura, ',date,' TcbnErik.'
+		.dc.b	' version 1.10+',version,' (C)1990-95 SHARP / Y.Nakamura, ',date,' TcbnErik.'
 crlf_msg:	.dc.b	CR,LF,0
 
 paramerr_msg:	.dc.b	'オプション指定に間違いがあります.',CR,LF,0
+
+.if CPU==68030
 mpu_err_msg:	.dc.b	'この MPU では使用できません.',CR,LF,0
+.endif
 
 usage_msg:	.dc.b	'usage : hiocs [option] [fontfile]',CR,LF
 		.dc.b	'	-c[chr]	二バイト文字未定義コードのフォント指定.',CR,LF
