@@ -43,6 +43,15 @@ LEA_CHRTABLE: .macro firstbyte,member,areg
 	lea	(chrtable+(sizeof_CHRTABLE*firstbyte)+member,pc),areg
 	.endm
 
+SHIFT_HALF_HIRA: .macro	dn
+	cmpi.b	#'ｦ',dn
+	bcs	@skip
+	cmpi.b	#'ﾝ',dn
+	bhi	@skip
+	eori.b	#$20,dn
+@skip:
+	.endm
+
 
 * Text Section ------------------------ *
 
@@ -240,13 +249,9 @@ putmes_small:				*1/4角文字
 	cmpi.b	#$12,d0			*	<+07
 	bcc	putmes_hkanji		*半角非漢字
 	lsr.b	#1,d0
-	bcc	putmes_small1
-	cmpi.b	#'ｦ',d1
-	bcs	putmes_small1
-	cmpi.b	#'ﾝ',d1
-	bhi	putmes_small1
-	eori.b	#$20,d1
-putmes_small1:
+	bcc	@f
+	SHIFT_HALF_HIRA d1
+@@:
 	bsr	putc_fonchg0
 	lea	(MKFONTBUF),a6
 	lea	(8,a6),a4
@@ -265,12 +270,7 @@ putmes_small2:
 	bra	b_putmes11
 
 putmes_hira:				*半角ひらがな
-	cmpi.b	#'ｦ',d1
-	bcs	putmes_hira1
-	cmpi.b	#'ﾝ',d1
-	bhi	putmes_hira1
-	eori.b	#$20,d1
-putmes_hira1:
+	SHIFT_HALF_HIRA d1
 	bsr	putc_fonchg
 	lsl	#4,d1
 	adda	d1,a0
@@ -1182,13 +1182,9 @@ putc_small:				*1/4角文字
 	cmpi.b	#$12,d0			*	<+07
 	bcc	putc_hkanji		*半角非漢字
 	lsr.b	#1,d0
-	bcc	putc_small1
-	cmpi.b	#'ｦ',d1
-	bcs	putc_small1
-	cmpi.b	#'ﾝ',d1
-	bhi	putc_small1
-	eori.b	#$20,d1
-putc_small1:
+	bcc	@f
+	SHIFT_HALF_HIRA d1
+@@:
 	bsr	putc_fonchg0
 	lea	(MKFONTBUF),a3
 	lea	(8,a3),a2
@@ -1210,11 +1206,7 @@ putc_ank:				*半角文字($01xx～$1fxx)		<+06
 	bra	putc_hira1
 
 putc_hira:				*半角ひらがな
-	cmpi.b	#'ｦ',d1
-	bcs	putc_hira1
-	cmpi.b	#'ﾝ',d1
-	bhi	putc_hira1
-	eori.b	#$20,d1
+	SHIFT_HALF_HIRA d1
 putc_hira1:
 	bsr	putc_fonchg
 	lsl	#4,d1
@@ -2183,13 +2175,9 @@ fntadr_small:				*1/4角文字
 	bcc	fntadr_hkanji		*半角非漢字
 	movem.l	a2-a3,-(sp)
 	lsr.b	#1,d0
-	bcc	fntadr_small1
-	cmpi.b	#'ｦ',d1
-	bcs	fntadr_small1
-	cmpi.b	#'ﾝ',d1
-	bhi	fntadr_small1
-	eori.b	#$20,d1
-fntadr_small1:
+	bcc	@f
+	SHIFT_HALF_HIRA d1
+@@:
 	bsr	putc_fonchg0
 	lea	(MKFONTBUF),a3
 	move.l	a3,d2
@@ -2210,11 +2198,7 @@ fntadr_small2:
 
 
 fntadr_hira:				*半角ひらがな
-	cmpi.b	#'ｦ',d1
-	bcs	fntadr_ank
-	cmpi.b	#'ﾝ',d1
-	bhi	fntadr_ank
-	eori.b	#$20,d1
+	SHIFT_HALF_HIRA d1
 fntadr_ank:				*半角１バイト文字($00～$ff)
 	bsr	putc_fonchg		*半角文字の変換
 	andi	#$00ff,d1
@@ -2541,11 +2525,8 @@ fntadr24_undef:
 *	半角ひらがな($8000～$80ff)
 
 fntadr24_hira:
-	cmpi.b	#'ｦ',d1
-	bcs	fntadr24_ank
-	cmpi.b	#'ﾝ',d1
-	bhi	fntadr24_ank
-	eori.b	#$20,d1
+	SHIFT_HALF_HIRA d1
+	bra	fntadr24_ank
 
 *	半角１バイト文字($00～$ff)
 
@@ -2569,13 +2550,9 @@ fntadr24_small:
 	bcc	fntadr24_uskhan		*半角外字
 	movem.l	a2-a3,-(sp)
 	lsr.b	#1,d0
-	bcc	fntadr24_small1
-	cmpi.b	#'ｦ',d1
-	bcs	fntadr24_small1
-	cmpi.b	#'ﾝ',d1
-	bhi	fntadr24_small1
-	eori.b	#$20,d1
-fntadr24_small1:
+	bcc	@f
+	SHIFT_HALF_HIRA d1
+@@:
 	bsr	putc_fonchg0
 	lea	(MKFONTBUF),a3
 	lea	(24,a3),a2

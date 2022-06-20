@@ -1,4 +1,4 @@
-		        HIOCS PLUS version 16.15
+		        HIOCS PLUS version 16.16
 		     (C)1990-95 SHARP / Y.Nakamura
 			  2022-03-23 TcbnErik
 
