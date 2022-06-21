@@ -1,6 +1,6 @@
-		        HIOCS PLUS version 16.16
-		     (C)1990-95 SHARP / Y.Nakamura
-			  2022-03-23 TcbnErik
+	Console and Graphics IOCS < HIOCS.X > version 1.10+16
+							by Y.Nakamura
+	HIOCS PLUS by TcbnErik
 
 
 HIOCS version 1.10+16 を改造しました。
