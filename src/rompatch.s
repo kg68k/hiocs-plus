@@ -74,7 +74,7 @@ gpalet3:				*65536色モードでのパレット設定
 	moveq	#0,d3
 	move.b	d1,d0
 	ror.l	#1,d0
-	asl.w	#1,d0
+	add	d0,d0
 	rol.l	#1,d0
 	cmp.l	#-1,d2
 	beq	gpalet4
@@ -87,7 +87,7 @@ gpalet5:
 	move	d1,d0
 	lsr.w	#8,d0
 	ror.l	#1,d0
-	asl.w	#1,d0
+	add	d0,d0
 	rol.l	#1,d0
 	ror.w	#8,d2
 	cmp.l	#-1,d2

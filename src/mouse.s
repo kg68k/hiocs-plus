@@ -1103,7 +1103,7 @@ mscdrawB10:
 	bmi	mscdrawB99		*パターンが完全に隠れる
 	move	d2,d3
 	add	d2,d2
-	adda	#$001e,a2
+	lea	($001e,a2),a2
 	suba	d2,a2			*パターンデータアドレスを調節する
 	bra	mscdrawB13
 mscdrawB11:
