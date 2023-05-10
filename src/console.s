@@ -2064,14 +2064,22 @@ fntget1:
 *****************************************
 
 fntadr::
-	cmpi.b	#12,d2
-	beq	fntadr24		;12×24,24×24ドットフォント
-
-	move.b	d2,-(sp)		;!!!
+	cmpi.b	#8,d2
+	beq	@f
+	tst.b	d2
+	beq	@f
+	cmpi.b	#6,d2
+	bne	fntadr24		;12×24,24×24ドットフォント
+					;bhiならROM1.3と同じ動作になる(d2.b=1～5が×16ドットフォント)
+@@:
+;8×16,16×16ドットフォント
+;6×12,12×12ドットフォント(8×16,16×16を縮小して作成する)
+	move.b	d2,-(sp)		;サイズ判別用、スタックから取り除くのを忘れないこと
 
 	cmpi	#$2000,d1		*?? ($0000～$1fffは半角)
 	bcs	fntadr_ank		*半角１バイト文字
-fntadr2:
+
+;$2000以上なら2バイト文字
 	move	d1,d2
 	clr.b	d2
 	eor	d2,d1
@@ -2079,9 +2087,9 @@ fntadr2:
 fntadr3:
 	lea	(chrtable,pc),a0
 	move.b	(~jisflag,a0,d2.w),d0
-	movea.l	(~fntadr,a0,d2.w),a0
 	bmi	fntadr_JIS		*ＪＩＳコード
 	beq	fntadr_undef		*未定義コード
+	movea.l	(~fntadr,a0,d2.w),a0
 
 	cmpi.b	#$04,d0
 	bcs	fntadr_kanji		*		全角漢字/非漢字
@@ -2121,7 +2129,7 @@ fntadr_JIS1:
 fntadr_JIS2:
 	cmpi.b	#$a0,d2
 	bcs	fntadr_JIS3
-	add.b	#$e0-$a0,d2
+	addi.b	#$e0-$a0,d2
 fntadr_JIS3:
 	lsl	#3,d2
 	bra	fntadr3
@@ -2148,7 +2156,7 @@ fntadr_extk1:
 	subi.b	#$5e,d0			*	<+06
 	addq.b	#1,d1
 fntadr_extk2:
-	move.b	(sp)+,d2			;!!!
+	move.b	(sp)+,d2			;パターンの大きさ
 	jmp	(a0)			*拡張外字処理呼び出し
 
 fntadr_hkanji:				*半角非漢字	<+07
@@ -2204,7 +2212,7 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 	andi	#$00ff,d1
 	ext.l	d1
 
-	subq.b	#6,(sp)+
+	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	@f
 
 	lsl	#4,d1
@@ -2227,7 +2235,7 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 
 
 fntadr_ank8:
-	subq.b	#6,(sp)+
+	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	fntadr6m
 
 	moveq	#8,d1			;#8<<16|1-1
@@ -2373,7 +2381,7 @@ fntadr_kanji:				*全角漢字/非漢字
 	adda	d1,a0
 	move.l	a0,d0
 fntadr_kanji16:
-	subq.b	#6,(sp)+
+	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	fntadr12m
 
 	move.l	#16<<16|2-1,d1		;16×16ドットフォント
@@ -2413,6 +2421,12 @@ sjis2tbl:
 	.dc	$15e0,$1600,$1620,$1640,$1660,$1680,$16a0,$16c0	*$fx
 	.dc	$16e0,$1700,$1720,$1740,$1760,-1,-1,-1
 
+
+*	未定義の漢字コード
+
+fntadr24_undef:
+	move	(UNDEFJIS,pc),d1
+	bra	fntadr24
 
 
 *	24×24/12×12ドットフォント
@@ -2458,18 +2472,16 @@ fntadr24_3:
 
 fntadr24_JIS:				*ＪＩＳコード
 	subi.b	#$21,d0
-	bcs	fntadr24_undef
 	cmpi.b	#$7f-$21,d0
 	bcc	fntadr24_undef
 	subi.b	#$21,d1
-	bcs	fntadr24_undef
 	cmpi.b	#$7f-$21,d1
 	bcc	fntadr24_undef
 fntadr24_10:
 	cmpi.b	#$30-$21,d0
 	bcc	fntadr24_kanjiB
-	lea	(fntadr24flg,pc),a0
-	tst.b	(a0,d0.w)
+	lea	(fntadr24flg,pc,d0.w),a0
+	tst.b	(a0)
 	beq	fntadr24_kanjiA
 	bpl	fntadr24_uskA
 	exg	d0,a0			*拡張外字
@@ -2516,13 +2528,6 @@ fntadr24_usk:
 	move.l	#24<<16|3-1,d1		*24×24ドットフォント
 	moveq	#24-1,d2
 	rts
-
-*	未定義の漢字コード
-
-fntadr24_undef:
-	move	(UNDEFJIS,pc),d1
-	bra	fntadr24
-
 
 *	半角ひらがな($8000～$80ff)
 

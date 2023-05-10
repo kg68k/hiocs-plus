@@ -14,7 +14,7 @@ SJ_SRCS = $(subst $(SRC_DIR)/,$(BLD_DIR)/,$(SRCS))
 
 .PHONY: all directories clean
 
-all: directories $(SJ_SRCS) $(BLD_DIR)/hiocs_plus.txt
+all: directories $(SJ_SRCS) $(BLD_DIR)/hiocs_plus.txt $(BLD_DIR)/ChangeLog.txt
 
 directories: $(BLD_DIR)
 
@@ -23,6 +23,9 @@ $(BLD_DIR):
 
 
 $(BLD_DIR)/hiocs_plus.txt: hiocs_plus.txt
+	$(U8TOSJ) < $^ >! $@
+
+$(BLD_DIR)/ChangeLog.txt: ChangeLog.md
 	$(U8TOSJ) < $^ >! $@
 
 $(BLD_DIR)/%: $(SRC_DIR)/%

@@ -13,7 +13,7 @@ PROG	= hiocs.x hiocs030.x
 
 SRCS	= header.s rompatch.s console.s doscon.s mouse.s graph.s work.s hiocs.s
 OBJS	= $(SRCS:.s=.o)
-DOCS	= hiocs_plus.txt
+DOCS	= hiocs_plus.txt ChangeLog.txt
 
 HIOCSP_ZIP = hiocsp.zip
 ARCS	= $(HIOCSP_ZIP)
