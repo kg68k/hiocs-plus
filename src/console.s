@@ -2063,6 +2063,16 @@ fntget1:
 *	IOCS $16	_FNTADR		*
 *****************************************
 
+SET_FONT_SIZE:	.macro	xdot,ydot,dreg1,dreg2
+	.if	xdot<=8
+		moveq	#xdot,dreg1
+		swap	dreg1
+	.else
+		move.l	#(xdot<<16)|((xdot+7)/8-1),dreg1
+	.endif
+	moveq	#ydot-1,dreg2
+	.endm
+
 fntadr::
 	cmpi.b	#8,d2
 	beq	@f
@@ -2218,9 +2228,7 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 	lsl	#4,d1
 	add.l	(FONTANK8,pc),d1	;8x16
 	move.l	d1,d0
-	moveq	#8,d1			;#8<<16|1-1
-	swap	d1
-	moveq	#16-1,d2
+	SET_FONT_SIZE	8,16,d1,d2
 	rts
 @@:
 	move.l	(FONTANK6,pc),d0	;6x12
@@ -2228,9 +2236,7 @@ fntadr_ank:				*半角１バイト文字($00～$ff)
 	add.l	d1,d0
 	add.l	d1,d0
 	add.l	d1,d0
-	moveq	#6,d1			;#6<<16|1-1
-	swap	d1
-	moveq	#12-1,d2
+	SET_FONT_SIZE	6,12,d1,d2
 	rts
 
 
@@ -2238,9 +2244,7 @@ fntadr_ank8:
 	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	fntadr6m
 
-	moveq	#8,d1			;#8<<16|1-1
-	swap	d1
-	moveq	#16-1,d2
+	SET_FONT_SIZE	8,16,d1,d2
 	rts
 
 
@@ -2270,9 +2274,7 @@ fntadr6m_loop:
 
 	movea.l	(sp)+,a1
 	move	#MKFONTBUF,d0
-	moveq	#6,d1			;#6<<16|1-1
-	swap	d1
-	moveq	#12-1,d2
+	SET_FONT_SIZE	6,12,d1,d2
 	rts
 
 P8TO6:	.macro	shift
@@ -2326,8 +2328,7 @@ fntadr12m_loop:
 	bne	fntadr12m_loop
 
 	movem.l	(sp)+,d3-d4/a1
-	move.l	#12<<16|2-1,d1		;12×12ドットフォント
-	moveq	#12-1,d2
+	SET_FONT_SIZE	12,12,d1,d2
 	rts
 
 
@@ -2384,8 +2385,7 @@ fntadr_kanji16:
 	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	fntadr12m
 
-	move.l	#16<<16|2-1,d1		;16×16ドットフォント
-	moveq	#16-1,d2
+	SET_FONT_SIZE	16,16,d1,d2
 	rts
 
 
@@ -2506,8 +2506,7 @@ fntadr24_kanjiA:			*$21xx～$28xx	非漢字
 	lsl.l	#3,d0			*×$40
 	add.l	d1,d0			*(mulu #24*3,d0)
 	add.l	(FONTKNJ24,pc),d0
-	move.l	#24<<16|3-1,d1		*24×24ドットフォント
-	moveq	#24-1,d2
+	SET_FONT_SIZE	24,24,d1,d2
 	rts
 
 fntadr24_uskA:				*$2cxx～$2dxx	外字Ａ
@@ -2525,8 +2524,7 @@ fntadr24_usk:
 	lsl.l	#3,d0			*×$40
 	add.l	d1,d0			*(mulu #24*3,d0)
 	add.l	a0,d0
-	move.l	#24<<16|3-1,d1		*24×24ドットフォント
-	moveq	#24-1,d2
+	SET_FONT_SIZE	24,24,d1,d2
 	rts
 
 *	半角ひらがな($8000～$80ff)
@@ -2546,8 +2544,7 @@ fntadr24_ank:
 	add.l	d1,d0
 	add.l	d1,d0
 	add.l	d1,d0
-	move.l	#12<<16|2-1,d1
-	moveq	#24-1,d2
+	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
 *	1/4角文字 ($f000～$f3ff)
@@ -2580,8 +2577,7 @@ fntadr24_small3:
 	movem.l	(sp)+,a2-a3
 	lea	(MKFONTBUF),a0
 	move.l	a0,d0
-	move.l	#12<<16|2-1,d1		*12×24ドットフォント
-	moveq	#24-1,d2
+	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
 *	半角外字($f400～$f5ff)
@@ -2597,8 +2593,7 @@ fntadr24_uskhan1:
 	add.l	d1,d0
 	add.l	d1,d0
 	add.l	d1,d0
-	move.l	#12<<16|2-1,d1		*12×24ドットフォント
-	moveq	#24-1,d2
+	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
 
