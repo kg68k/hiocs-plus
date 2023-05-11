@@ -52,6 +52,16 @@ SHIFT_HALF_HIRA: .macro	dn
 @skip:
 	.endm
 
+LSL_2:	.macro	dn
+	.sizem	sz
+.if CPU>=68020
+	lsl&sz	#2,dn
+.else
+	add&sz	dn,dn
+	add&sz	dn,dn
+.endif
+	.endm
+
 
 * Text Section ------------------------ *
 
@@ -2794,12 +2804,7 @@ putc_eral3:
 	move	(sp),d1			;lsl	#8,d1
 	move.b	(sp)+,d1		;move.b	d2,d1
 	addq.b	#1,d1			*転送先ラスター
-.if CPU>=68020
-	lsl	#2,d0
-.else
-	add	d0,d0
-	add	d0,d0
-.endif
+	LSL_2	d0
 	subq	#1,d0			*転送ラスター数
 	move	#$0101,d2
 	bsr	putc_rascpy
@@ -2985,12 +2990,7 @@ putc_rollup:
 .endif
 	move.b	d0,d1
 	move	(CSRYMAX),d0
-.if CPU>=68020
-	lsl	#2,d0
-.else
-	add	d0,d0
-	add	d0,d0			*スクロールラスター数
-.endif
+	LSL_2	d0			;スクロールラスター数
 	move	#$0101,d2
 	bsr	putc_rascpy		*スクロールアップ
 	move	(CSRYMAX),d1
@@ -3009,12 +3009,7 @@ putc_rolldw:
 	swap	d1
 	rol.l	#7,d1
 	move	(CSRYMAX),d0
-.if CPU>=68020
-	lsl	#2,d0
-.else
-	add	d0,d0
-	add	d0,d0			*スクロールラスター数
-.endif
+	LSL_2	d0			;スクロールラスター数
 	add.b	d0,d1
 	addq.b	#3,d1
 	move.b	d1,d2			*スクロール開始ラスター	(転送先)
@@ -3862,12 +3857,7 @@ putc_ins1:
 	rol.l	#7,d0
 	move	d3,d1			*CSRYMAX
 	addq	#1,d1
-.if CPU>=68020
-	lsl	#2,d1
-.else
-	add	d1,d1
-	add	d1,d1			*４倍
-.endif
+	LSL_2	d1			;4倍
 	subq	#1,d1
 	add	d1,d0			*スクロール開始ラスター (転送先)
 	move.l	d0,d1
@@ -3957,12 +3947,7 @@ putc_del1:
 	swap	d0
 	rol.l	#7,d0
 	move	d2,d1
-.if CPU>=68020
-	lsl	#2,d1
-.else
-	add	d1,d1
-	add	d1,d1			*４倍
-.endif
+	LSL_2	d1			;4倍
 	add	d1,d0			*スクロール開始ラスター (転送先)
 	move.l	d0,d1
 	add	d4,d1
