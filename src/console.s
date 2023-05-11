@@ -206,10 +206,10 @@ putmes_knj88:				*～$889e:拡張外字 / $889f～:漢字
 	cmpi.b	#$9f,d1
 	bcs	putmes_extk
 putmes_kanji:				*全角漢字/非漢字
-	lea	(sjis2tbl,pc),a6
 .if CPU>=68020
-	move	(a6,d1.w*2),d1
+	move	(sjis2tbl,pc,d1.w*2),d1
 .else
+	lea	(sjis2tbl,pc),a6
 	add	d1,d1
 	move	(a6,d1.w),d1
 .endif
@@ -244,10 +244,10 @@ putmes_hkanji:				*半角非漢字	<+07
 	cmpi.b	#$9f,d1
 	bcc	putmes_kanji		*～$869e:半角非漢字 / $869f～:全角非漢字
 putmes_hkanji1:
-	lea	(sjis2tbl,pc),a6
 .if CPU>=68020
-	move	(a6,d1.w*2),d1
+	move	(sjis2tbl,pc,d1.w*2),d1
 .else
+	lea	(sjis2tbl,pc),a6
 	add	d1,d1
 	move	(a6,d1.w),d1
 .endif
@@ -365,9 +365,9 @@ b_putmes55:
 	beq	b_putmes60
 	subq	#1,d4
 	bmi	b_putmes57		*表示桁数が半角１文字分しか残っていない
-	move	a3,d0
 	lea	(putc_wetbl,pc),a6	*全角文字の場合(偶数アドレス)
 .if CPU<68020
+	move	a3,d0
 	lsr	#1,d0
 	bcc	b_putmes56
 	lea	(putc_wotbl,pc),a6	*全角文字の場合(奇数アドレス)
@@ -558,12 +558,13 @@ putc1:					*文字コードの続き
 	beq	putc_2bA		*IOCS _FNTADRは内部ルーチン
 .if CPU>=68020
 	lsl	#8,d0
-.else
-	move.b	d0,-(sp)
-	move	(sp)+,d0
-.endif
 	move.b	d1,d0
 	move	d0,d1
+.else
+	move	d1,-(sp)
+	move.b	d0,(sp)
+	move	(sp)+,d1
+.endif
 putc4:					*IOCS _FNTADRによってフォントアドレスを得る
 	moveq	#8,d2
 	movea.l	(_FNTADR*4+$400),a0
@@ -1177,10 +1178,10 @@ putc_hkanji:				*半角非漢字	<+07
 	cmpi.b	#$9f,d1
 	bcc	putc_kanji		*～$869e:半角非漢字 / $869f～:全角非漢字
 putc_hkanji1:
-	lea	(sjis2tbl,pc),a3
 .if CPU>=68020
-	move	(a3,d1.w*2),d1
+	move	(sjis2tbl,pc,d1.w*2),d1
 .else
+	lea	(sjis2tbl,pc),a3
 	add	d1,d1
 	move	(a3,d1.w),d1
 .endif
@@ -1292,10 +1293,10 @@ putc_knj88:				*～$889e:拡張外字 / $889f～:漢字
 	cmpi.b	#$9f,d1
 	bcs	putc_extk
 putc_kanji:				*全角漢字/非漢字
-	lea	(sjis2tbl,pc),a3
 .if CPU>=68020
-	move	(a3,d1.w*2),d1
+	move	(sjis2tbl,pc,d1.w*2),d1
 .else
+	lea	(sjis2tbl,pc),a3
 	add	d1,d1
 	move	(a3,d1.w),d1
 .endif
@@ -2222,39 +2223,34 @@ fntadr_small2:
 	move.l	(a0)+,(a3)+
 	movem.l	(sp)+,a2-a3
 	move.l	d2,d0
-	bra	fntadr_ank8
+fntadr_ank8:
+	subq.b	#6,(sp)+		;パターンの大きさ
+	bne	fntadr_ank8end
+	bra	fntadr6m
 
 
 fntadr_hira:				*半角ひらがな
 	SHIFT_HALF_HIRA d1
 fntadr_ank:				*半角１バイト文字($00～$ff)
 	bsr	putc_fonchg		*半角文字の変換
-	andi	#$00ff,d1
-	ext.l	d1
+	moveq	#0,d0
+	move.b	d1,d0
 
 	subq.b	#6,(sp)+		;パターンの大きさ
 	beq	@f
 
-	lsl	#4,d1
-	add.l	(FONTANK8,pc),d1	;8x16
-	move.l	d1,d0
+	lsl	#4,d0
+	add.l	(FONTANK8,pc),d0
+fntadr_ank8end:
 	SET_FONT_SIZE	8,16,d1,d2
 	rts
 @@:
-	move.l	(FONTANK6,pc),d0	;6x12
-	lsl.l	#2,d1
-	add.l	d1,d0
-	add.l	d1,d0
-	add.l	d1,d0
+	LSL_2	d0			;4n
+	move	d0,d1
+	add	d0,d0			;8n
+	add	d1,d0			;8n+4n=12n
+	add.l	(FONTANK6,pc),d0
 	SET_FONT_SIZE	6,12,d1,d2
-	rts
-
-
-fntadr_ank8:
-	subq.b	#6,(sp)+		;パターンの大きさ
-	beq	fntadr6m
-
-	SET_FONT_SIZE	8,16,d1,d2
 	rts
 
 
@@ -2283,7 +2279,7 @@ fntadr6m_loop:
 	bne	fntadr6m_loop
 
 	movea.l	(sp)+,a1
-	move	#MKFONTBUF,d0
+	move	#MKFONTBUF,d0			;この時点でd0.hw=0なのでmove.wでよい
 	SET_FONT_SIZE	6,12,d1,d2
 	rts
 
@@ -2547,13 +2543,13 @@ fntadr24_hira:
 
 fntadr24_ank:
 	bsr	putc_fonchg		*半角文字の変換
-	andi	#$00ff,d1
-	ext.l	d1
-	move.l	(FONTANK12,pc),d0	*12×24ドットフォント
-	lsl.l	#4,d1
-	add.l	d1,d0
-	add.l	d1,d0
-	add.l	d1,d0
+	moveq	#0,d0
+	move.b	d1,d0
+	lsl	#4,d0			;16n
+	move	d0,d1
+	add	d0,d0			;32n
+	add	d1,d0			;32n+16n=48n
+	add.l	(FONTANK12,pc),d0
 	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
@@ -2577,7 +2573,7 @@ fntadr24_small2:
 	movea.l	(FONTSML12,pc),a0
 	lsl	#3,d1
 	adda	d1,a0
-	adda	d1,a0
+	add	d1,d1
 	adda	d1,a0
 	moveq	#6-1,d0
 fntadr24_small3:
@@ -2585,8 +2581,7 @@ fntadr24_small3:
 	move.l	(a0)+,(a3)+
 	dbra	d0,fntadr24_small3
 	movem.l	(sp)+,a2-a3
-	lea	(MKFONTBUF),a0
-	move.l	a0,d0
+	move	#MKFONTBUF,d0		;この時点でd0.hw=0なのでmove.wでよい
 	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
@@ -2597,12 +2592,12 @@ fntadr24_uskhan:
 	beq	fntadr24_uskhan1
 	addi	#$100,d1
 fntadr24_uskhan1:
-	lsl	#4,d1
-	ext.l	d1
-	move.l	(USKFONT5),d0
-	add.l	d1,d0
-	add.l	d1,d0
-	add.l	d1,d0
+	lsl	#4,d1			;16n
+	moveq	#0,d0
+	move	d1,d0
+	add	d1,d0
+	add	d1,d0			;48n
+	add.l	(USKFONT5),d0
 	SET_FONT_SIZE	12,24,d1,d2
 	rts
 
@@ -2980,15 +2975,17 @@ putc_rollup:
 	move.l	(TXSTOFST),d1		*ラスターコピースクロール
 	swap	d1
 	rol.l	#7,d1
+.if CPU>=68020
 	move.b	d1,d0			*スクロール開始ラスター	(転送先)
 	addq	#4,d1			*			(転送元)
-.if CPU>=68020
 	lsl	#8,d1
+	move.b	d0,d1
 .else
-	move.b	d1,-(sp)
+	move	d1,-(sp)
+	addq.b	#4,d1
+	move.b	d1,(sp)
 	move	(sp)+,d1
 .endif
-	move.b	d0,d1
 	move	(CSRYMAX),d0
 	LSL_2	d0			;スクロールラスター数
 	move	#$0101,d2
@@ -3012,15 +3009,17 @@ putc_rolldw:
 	LSL_2	d0			;スクロールラスター数
 	add.b	d0,d1
 	addq.b	#3,d1
+.if CPU>=68020
 	move.b	d1,d2			*スクロール開始ラスター	(転送先)
 	subq	#4,d1			*			(転送元)
-.if CPU>=68020
 	lsl	#8,d1
+	move.b	d2,d1
 .else
-	move.b	d1,-(sp)
+	move	d1,-(sp)
+	subq	#4,d1
+	move.b	d1,(sp)
 	move	(sp)+,d1
 .endif
-	move.b	d2,d1
 	move	#$feff,d2
 	bsr	putc_rascpy		*スクロールダウン
 	moveq	#$00,d1
