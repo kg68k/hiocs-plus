@@ -3058,13 +3058,13 @@ putc_sftrdw:
 	move.l	d0,d4
 	lsl	#5,d4			*32倍
 	subq	#1,d4
-	ror	#5,d0
 	swap	d0
+	lsr.l	#5,d0			;(テキスト行数-1)*16*128
 	movea.l	d0,a2
 	lea	(128*15,a2),a2
 	adda.l	(TXSTOFST),a2
 	adda.l	(TXADR),a2		*スクロール開始アドレス　(転送先)
-	lea	(-$0800,a2),a1		*１行上のＶＲＡＭアドレス(転送元)
+	lea	(-128*16,a2),a1		*１行上のＶＲＡＭアドレス(転送元)
 	bsr	putc_sdwdo		*スクロールダウン
 	moveq	#$00,d1
 	moveq	#$01,d0
