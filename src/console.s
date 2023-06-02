@@ -2970,8 +2970,10 @@ putc_rascpy9:
 
 putc_rollup:
 	movem.l	d0-d2,-(sp)
-	tst	(SCROLLMOD)
+	.fail	(SCROLLMOD+2).ne.SMTSCROLL
+	move.l	(SCROLLMOD),d0
 	bne	putc_sftrup		*ソフトコピー/スムーススクロール
+
 	move.l	(TXSTOFST),d1		*ラスターコピースクロール
 	swap	d1
 	rol.l	#7,d1
@@ -3031,8 +3033,9 @@ putc_rolldw:
 *	ソフトコピーによってスクロールアップする
 
 putc_sftrup:
-	move	(SMTSCROLL),d0
-	bne	putc_smtrup
+	tst	(SCROLLMOD)		;この時点で SCROLLMOD!=0 or SMTSCROLL!=0
+	beq	putc_smtrup		;SMTSCROLL = 1,2,3
+
 	movem.l	d3-d4/a0-a5,-(sp)
 	move	(CSRYMAX),d4
 	lsl	#5,d4			*32倍
@@ -3134,8 +3137,10 @@ putc_sftrdo4:
 putc_sftrdo5:
 	jmp	(a0)
 
+;スムーススクロール
 putc_smtrup:
-	add	d0,d0			*スムーススクロール
+	andi	#3,d0			;d0.w=SMTSCROLL 1,2,3
+	lsl	#3,d0
 	movem.l	d3/a0-a1,-(sp)
 	lea	(putc_smtdata-8,pc,d0.w),a1
 	movea.l	(TXADR),a0
@@ -3183,11 +3188,18 @@ putc_smtup2:
 	movem.l	(sp)+,d0-d2
 	rts
 
+SMTDATA:.macro	dot,padding
+	.sizem	sz,count
+	.dc	dot-1,16/dot-1,dot/4
+	.if	count>1
+	.dc	padding			;8バイト単位にするための詰め物
+	.endif
+	.endm
+
 putc_smtdata:				*スムーススクロール用データ
-	.dc	$0003,$0003,$0001,0	*４ドット単位
-	.dc	$0007,$0001,$0002,0	*８ドット単位
-	.dc	0,0,0,0
-	.dc	$000f,$0000,$0004	*16ドット単位
+	SMTDATA	4,0
+	SMTDATA	8,0
+	SMTDATA	16
 
 
 
@@ -3355,7 +3367,7 @@ putc_escex10:				*ESC [?
 	moveq	#0,d1
 	cmpi	#'4l',d0
 	beq	putc_escex11		*ESC [?4l	ジャンプスクロールモード
-	moveq	#8,d1			*８ドットスクロール
+	moveq	#2,d1			*８ドットスクロール
 	cmpi	#'4h',d0		*ESC [?4h	スムーススクロールモード
 	bne	putc_escex15
 putc_escex11:
@@ -4255,12 +4267,8 @@ b_conmod1:
 b_conmod2:
 	moveq	#3,d0
 	and	d2,d0
-	move.b	(smtscroll_table,pc,d0.w),d0
 	move	d0,(SMTSCROLL)
 	bra	b_conmod9
-smtscroll_table:
-	.dc.b	0,4,8,16
-	.even
 
 *	d1.w=0	カーソル点滅をする
 

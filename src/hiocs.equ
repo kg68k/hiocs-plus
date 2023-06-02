@@ -189,7 +189,7 @@ MSRCVDATA:	.equ	$000cb1	*- マウスからの生受信データ(～$000cb3 3byte
 MPUTYPE:	.equ	$cbc	*b
 
 SCROLLMOD:	.equ	$d08	*w	(0:ラスタコピー -1:ソフトスクロール)
-SMTSCROLL:	.equ	$d0a	*w	(0:ジャンプ 4,8,16:スムース)
+SMTSCROLL:	.equ	$d0a	*w	(0:ジャンプ 1:4ドット 2:8ドット 3:16ドット)
 CSRWINKSW:	.equ	$d0c	*w	(0:点滅 -1:表示したまま)
 CSRDRLINE:	.equ	$d0e	*w	(反転開始ライン×4)
 CSRLPAT:	.equ	$d10	*w	(反転パターン:0ならバッファパターンで描画)
