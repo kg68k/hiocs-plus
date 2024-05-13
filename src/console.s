@@ -133,32 +133,37 @@ b_putmes5:
 	adda	d1,a0
 	bra	b_putmes11
 
+BRA_IF_INVALID_EXCHR: .macro undef_label
+  subi.b #$40,d1
+  bcs undef_label
+  cmpi.b #$7f-$40,d1
+  bcs @skip1
+  beq undef_label
+    subq.b #1,d1
+  @skip1:
+  cmpi.b #$fc-1-$40,d1
+  bhi undef_label
+
+  exg d0,d1
+  ext d1
+  add.b d1,d1
+  subq.b #2,d1
+  cmpi.b #$5e,d0
+  bcs @skip2
+    subi.b #$5e,d0
+    addq.b #1,d1
+  @skip2:
+.endm
+
 putmes_extk:				*拡張外字
-	move.l	(EXCHRVECT,pc),d2
-	beq	putmes_undef		*拡張外字ベクタは未設定
-	movea.l	d2,a0
-	subi.b	#$40,d1
-	bcs	putmes_undef
-	cmpi.b	#$7f-$40,d1
-	bcs	putmes_extk1
-	beq	putmes_undef
-	subq.b	#1,d1
-putmes_extk1:
-	cmpi.b	#$fc-1-$40,d1
-	bhi	putmes_undef
-	exg	d0,d1
-	ext	d1
-	add.b	d1,d1
-	subq.b	#2,d1
-	cmpi.b	#$5e,d0			*	<+06
-	bcs	putmes_extk2
-	subi.b	#$5e,d0			*	<+06
-	addq.b	#1,d1
-putmes_extk2:
+  move.l (EXCHRVECT,pc),d2
+  beq putmes_undef  ;拡張外字ベクタは未設定
+  BRA_IF_INVALID_EXCHR putmes_undef
+  movea.l d2,a0
 	moveq	#8,d2
 	jsr	(a0)			*拡張外字処理呼び出し
 	movea.l	d0,a0
-	tst	d1
+	tst	d1			;Xバイト数-1
 	beq	b_putmes11
 	bra	putmes_kanji1
 
@@ -1145,31 +1150,14 @@ putc_fonchg4:				*|
 	rts
 
 putc_extk:				*拡張外字
-	move.l	(EXCHRVECT,pc),d2
-	beq	putc_undef		*拡張外字ベクタは未設定
-	movea.l	d2,a0
-	subi.b	#$40,d1
-	bcs	putc_undef
-	cmpi.b	#$7f-$40,d1
-	bcs	putc_extk1
-	beq	putc_undef
-	subq.b	#1,d1
-putc_extk1:
-	cmpi.b	#$fc-1-$40,d1
-	bhi	putc_undef
-	exg	d0,d1
-	ext	d1
-	add.b	d1,d1
-	subq.b	#2,d1
-	cmpi.b	#$5e,d0			*	<+06
-	bcs	putc_extk2
-	subi.b	#$5e,d0			*	<+06
-	addq.b	#1,d1
-putc_extk2:
+  move.l (EXCHRVECT,pc),d2
+  beq putc_undef  ;拡張外字ベクタは未設定
+  BRA_IF_INVALID_EXCHR putc_undef
+  movea.l d2,a0
 	moveq	#8,d2
 	jsr	(a0)			*拡張外字処理呼び出し
 	movea.l	d0,a0
-	tst	d1
+	tst	d1			;Xバイト数-1
 	beq	putc_bpat
 	bra	putc_wpat
 
@@ -2157,27 +2145,12 @@ fntadr_JIS3:
 
 
 fntadr_extk:				*拡張外字
-	move.l	(EXCHRVECT,pc),d2
-	beq	fntadr_undef		*拡張外字ベクタは未設定
-	subi.b	#$40,d1
-	bcs	fntadr_undef
-	cmpi.b	#$7f-$40,d1
-	bcs	fntadr_extk1
-	beq	fntadr_undef
-	subq.b	#1,d1
-fntadr_extk1:
-	cmpi.b	#$fc-1-$40,d1
-	bhi	fntadr_undef
-	exg	d0,d1
-	ext	d1
-	add.b	d1,d1
-	subq.b	#2,d1
-	cmpi.b	#$5e,d0			*	<+06
-	bcs	fntadr_extk2
-	subi.b	#$5e,d0			*	<+06
-	addq.b	#1,d1
-fntadr_extk2:
-	move.b	(sp)+,d2			;パターンの大きさ
+  movea.l d0,a0  ;d2を破壊せず値のテストとa0へのセットを行う
+  move.l (EXCHRVECT,pc),d0
+  exg d0,a0
+  beq fntadr_undef  ;拡張外字ベクタは未設定
+  BRA_IF_INVALID_EXCHR fntadr_undef
+	move.b	(sp)+,d2		;パターンの大きさ
 	jmp	(a0)			*拡張外字処理呼び出し
 
 fntadr_hkanji:				*半角非漢字	<+07
