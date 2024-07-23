@@ -2418,8 +2418,7 @@ fntadr24:
 	eor	d0,d1
 	lsr	#8,d0
 	cmpi.b	#$80,d0
-	beq	fntadr24_hira		*$80xx		半角ひらがな
-	bcs	fntadr24_JIS		*ＪＩＳコード
+	bls	fntadr24_hiraJIS	*$80xx 半角ひらがな or JISコード
 	cmpi.b	#$f0,d0
 	bcc	fntadr24_small		*$f0xx～$ffxx	1/4角文字 / 半角外字
 
@@ -2449,7 +2448,9 @@ fntadr24_3:
 	addq.b	#1,d0			*$xx9f～$xxfc
 	bra	fntadr24_10
 
-fntadr24_JIS:				*ＪＩＳコード
+fntadr24_hiraJIS:
+	beq	fntadr24_hira		*$80xx	半角ひらがな
+*fntadr24_JIS:				*ＪＩＳコード
 	subi.b	#$21,d0
 	cmpi.b	#$7f-$21,d0
 	bcc	fntadr24_undef
@@ -2561,10 +2562,10 @@ fntadr24_small3:
 *	半角外字($f400～$f5ff)
 
 fntadr24_uskhan:
-	lsr.b	#1,d0
-	beq	fntadr24_uskhan1
-	addi	#$100,d1
-fntadr24_uskhan1:
+	lsr.b	#1,d0			;d0.w==$00f5なら
+	scs	d0
+	addx	d0,d1			;d1.wに$00ff+X==$0100を足す
+
 	lsl	#4,d1			;16n
 	moveq	#0,d0
 	move	d1,d0

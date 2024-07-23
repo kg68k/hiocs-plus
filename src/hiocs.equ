@@ -14,8 +14,8 @@
 * HIOCS PLUS Version ------------------ *
 
 program:	.reg	'HIOCS PLUS'
-version:	.reg	'16.20'
-date:		.reg	'2024-05-13'
+version:	.reg	'16.21'
+date:		.reg	'2024-07-23'
 
 
 * Target MPU -------------------------- *
