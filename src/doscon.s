@@ -314,7 +314,7 @@ fputs9:
 conctrl::
 	move	(a6)+,d0
 	cmpi	#18,d0
-	bhi	conctrl8
+	bhi	conctrl9
 	suba.l	a5,a5
 .if CPU>=68020
 	movea.l	(_B_PUTC*4+$400,d0.w*4),a0
@@ -327,10 +327,6 @@ conctrl::
 	movea.l	(a0,d1.w),a0
 	jmp	(conjmptbl,pc,d0.w)
 .endif
-
-conctrl8:
-	moveq.l	#-1,d0
-	rts
 
 conctrl9:
 	subq.l	#2,a6
@@ -356,29 +352,17 @@ conjmptbl:
 	bra.s	conctrl9	*15:スクロール範囲設定
 	bra.s	conctrl9	*16:スクリーンモード設定
 	bra.s	conc_curon	*17:カーソル表示
-	bra.s	conc_curoff	*18:カーソル無表示
+	bra	conc_curoff	*18:カーソル無表示
+
+conc_curoff:
+	movea.l	_OS_CUROF*4+$000400.w,a0
+	jmp	(a0)
+
+conc_curon:
+	movea.l	_OS_CURON*4+$000400.w,a0
+	jmp	(a0)
 
 conc_putc:
-	moveq.l	#0,d1
-	move	(a6),d1
-	cmpa.l	#b_putc,a0
-	bne	conc_putc5
-	bsr	b_curoff
-	bsr	putc
-	bsr	b_curon
-	moveq.l	#0,d0
-	rts
-conc_putc5:
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
-
-conc_print:
-	movea.l	(a6),a1
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
-
 conc_color:
 conc_up:
 conc_down:
@@ -391,28 +375,16 @@ conc_del:
 	move	(a6),d1
 conc_down_s:
 conc_up_s:
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
+	jmp	(a0)
+
+conc_print:
+	movea.l	(a6),a1
+	jmp	(a0)
 
 conc_locate:
 	move	(a6)+,d1
 	move	(a6),d2
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
-
-conc_curon:
-	movea.l	_OS_CURON*4+$000400.w,a0
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
-
-conc_curoff:
-	movea.l	_OS_CUROF*4+$000400.w,a0
-	jsr	(a0)
-	moveq.l	#0,d0
-	rts
+	jmp	(a0)
 
 
 
