@@ -38,6 +38,8 @@ hiocs.x: $(OBJS)
 hiocs030.x: $(OBJS:.o=030.o)
 	$(LD) $(LDFLAGS) -o $@ $^
 
+hiocs.o hiocs030.o: version.equ
+
 %.o: %.s hiocs.equ
 	$(AS) $(ASFLAGS) -o $@ $< -sCPU=68000
 

@@ -14,6 +14,7 @@
 	.include	doscall.mac
 	.include	iocscall.mac
 	.include	hiocs.equ
+	.include	version.equ
 
 
 * Global Symbols ---------------------- *
@@ -2098,7 +2099,8 @@ title_msg_2:	.dc.b	program
 .if CPU==68030
 		.dc.b	' for X68030'
 .endif
-		.dc.b	' version 1.10+',version,' (C)1990-95 SHARP / Y.Nakamura, ',date,' TcbnErik.'
+		.dc.b	' version 1.10+',version,version_suffix
+		.dc.b	' (C)1990-95 SHARP / Y.Nakamura, (C)2025 TcbnErik.'
 crlf_msg:	.dc.b	CR,LF,0
 
 paramerr_msg:	.dc.b	'オプション指定に間違いがあります.',CR,LF,0
