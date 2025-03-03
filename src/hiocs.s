@@ -2103,55 +2103,55 @@ title_msg_2:	.dc.b	program
 		.dc.b	' (C)1990-95 SHARP / Y.Nakamura, (C)2025 TcbnErik.'
 crlf_msg:	.dc.b	CR,LF,0
 
-paramerr_msg:	.dc.b	'オプション指定に間違いがあります.',CR,LF,0
+paramerr_msg:	.dc.b	'オプション指定に間違いがあります。',CR,LF,0
 
 .if CPU==68030
-mpu_err_msg:	.dc.b	'この MPU では使用できません.',CR,LF,0
+mpu_err_msg:	.dc.b	'この MPU では使用できません。',CR,LF,0
 .endif
 
 usage_msg:	.dc.b	'usage : hiocs [option] [fontfile]',CR,LF
-		.dc.b	'	-c[chr]	二バイト文字未定義コードのフォント指定.',CR,LF
-		.dc.b	'	-d	DOSコンソール出力を速くしない.',CR,LF
-		.dc.b	'	-e	ESC 0-3を無効にする.',CR,LF
-		.dc.b	'	-f	フォントを初期化する.',CR,LF
-		.dc.b	'	-g	グラフィック描画のみ速くする.',CR,LF
-		.dc.b	'	-j	二バイト文字未定義コードをサポートしない.',CR,LF
-		.dc.b	'	-l[n]	JISコード$7621～$7e7eのフォントモード指定(n:0～1).',CR,LF
-		.dc.b	'	-m	ROMの修正のみ行う.',CR,LF
-		.dc.b	'	-ms[n]	マウスカーソルの移動速度指定(n:1～4 標準は2).',CR,LF
-		.dc.b	'	-mh	SCCクロック7.5MHzモードにする.',CR,LF
-		.dc.b	'	-s	半角文字(\,~,|)のスイッチ指定を無視する.',CR,LF
-		.dc.b	'	-u[n]	JISコード$2921～$2f7eのフォントモード指定(n:0～2).',CR,LF
-		.dc.b	'	-v	ビープ音をビジュアルベルにする.',CR,LF
-		.dc.b	'	-r	組み込み解除.',CR,LF
+		.dc.b	'	-c[chr]	二バイト文字未定義コードのフォント指定',CR,LF
+		.dc.b	'	-d	DOSコンソール出力を速くしない',CR,LF
+		.dc.b	'	-e	ESC 0-3を無効にする',CR,LF
+		.dc.b	'	-f	フォントを初期化する',CR,LF
+		.dc.b	'	-g	グラフィック描画のみ速くする',CR,LF
+		.dc.b	'	-j	二バイト文字未定義コードをサポートしない',CR,LF
+		.dc.b	'	-l[n]	JISコード$7621～$7e7eのフォントモード指定(n:0～1)',CR,LF
+		.dc.b	'	-m	ROMの修正のみ行う',CR,LF
+		.dc.b	'	-ms[n]	マウスカーソルの移動速度指定(n:1～4 標準は2)',CR,LF
+		.dc.b	'	-mh	SCCクロック7.5MHzモードにする',CR,LF
+		.dc.b	'	-s	半角文字(\,~,|)のスイッチ指定を無視する',CR,LF
+		.dc.b	'	-u[n]	JISコード$2921～$2f7eのフォントモード指定(n:0～2)',CR,LF
+		.dc.b	'	-v	ビープ音をビジュアルベルにする',CR,LF
+		.dc.b	'	-r	組み込み解除',CR,LF
 		.dc.b	0
 
-fontchg_msg:	.dc.b	'ユーザーフォントデータに切り替えます.',CR,LF,0
+fontchg_msg:	.dc.b	'ユーザーフォントデータに切り替えます。',CR,LF,0
 
-nofont_msg:	.dc.b	'フォントファイルが見つかりません.',CR,LF,0
+nofont_msg:	.dc.b	'フォントファイルが見つかりません。',CR,LF,0
 
-badfont_msg:	.dc.b	'フォントファイルが異常です.',CR,LF,0
+badfont_msg:	.dc.b	'フォントファイルが異常です。',CR,LF,0
 
-initfont_msg:	.dc.b	'フォントデータを初期化します.',CR,LF,0
+initfont_msg:	.dc.b	'フォントデータを初期化します。',CR,LF,0
 
-bgerr_msg:	.dc.b	'バックグランドプロセスでの処理はできません.',CR,LF,0
+bgerr_msg:	.dc.b	'バックグランドプロセスでの処理はできません。',CR,LF,0
 
-vererr_msg:	.dc.b	'HIOCSの常駐部とバージョンが違います.',CR,LF,0
+vererr_msg:	.dc.b	'HIOCSの常駐部とバージョンが違います。',CR,LF,0
 
-vecterr_msg:	.dc.b	'ベクタが書き換えられています.',CR,LF,0
+vecterr_msg:	.dc.b	'ベクタが書き換えられています。',CR,LF,0
 
-rels_msg:	.dc.b	'IOCSを元に戻しました.',CR,LF,0
+rels_msg:	.dc.b	'IOCSを元に戻しました。',CR,LF,0
 
-nostay_msg:	.dc.b	'HIOCSは組み込まれていません.',CR,LF,0
+nostay_msg:	.dc.b	'HIOCSは組み込まれていません。',CR,LF,0
 
-nomem_msg:	.dc.b	'メモリ容量が不足しています.',CR,LF,0
+nomem_msg:	.dc.b	'メモリ容量が不足しています。',CR,LF,0
 
-relserr_msg:	.dc.b	'メモリ管理情報が破壊されています！ リセットしてください.'
+relserr_msg:	.dc.b	'メモリ管理情報が破壊されています！ リセットしてください。'
 		.dc.b	$1b,'[>5l',0
 
-alrrom_msg:	.dc.b	'すでにベクタが書き換えられています.',CR,LF,0
+alrrom_msg:	.dc.b	'すでにベクタが書き換えられています。',CR,LF,0
 
-rompat_msg:	.dc.b	'IOCS ROMにパッチ当てを行ないました.',CR,LF,0
+rompat_msg:	.dc.b	'IOCS ROMにパッチ当てを行ないました。',CR,LF,0
 
 * Block Storage Section -------------- *
 
