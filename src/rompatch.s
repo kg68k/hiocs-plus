@@ -182,10 +182,3 @@ ms_patst2:
 patchend::
 
 	.end
-
-* End of File ------------------------- *
-
-*	$Log:	ROMPATCH.HA_ $
-* Revision 1.1  92/09/14  01:15:56  YuNK
-* Initial revision
-* 

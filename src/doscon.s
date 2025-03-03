@@ -550,10 +550,3 @@ write99:				*<+05
 	rts
 
 	.end
-
-* End of File ------------------------- *
-
-*	$Log:	DOSCON.HA_ $
-* Revision 1.1  92/09/14  01:17:08  YuNK
-* Initial revision
-* 

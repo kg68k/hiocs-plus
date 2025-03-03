@@ -1302,28 +1302,3 @@ ms_vcs::
 	rts
 
 	.end
-
-* End of File ------------------------ *
-
-*	$Log:	MOUSE.HA_ $
-* Revision 1.7  92/11/18  00:12:10  YuNK
-* Timer-C処理ルーチンを変更する一部のプログラムとの相性を良くした
-* 
-* Revision 1.6  92/11/08  22:17:06  YuNK
-* マウス送信要求処理を少し変更。
-* 
-* Revision 1.5  92/10/21  17:08:56  YuNK
-* IOCS _MS_LIMITなどでマウスカーソルが残ることがあるバグを修正
-* 
-* Revision 1.4  92/09/21  14:33:04  YuNK
-* 割り込み禁止解除の処理の不都合を修正
-* 
-* Revision 1.3  92/09/18  13:29:50  YuNK
-* IOCS _MS_CURSTが正常に動作しないバグを修正
-* 
-* Revision 1.2  92/09/16  14:47:58  YuNK
-* ＳＸウィンドウでマウスが動作しないバグ取り
-* 
-* Revision 1.1  92/09/14  01:19:12  YuNK
-* Initial revision
-* 

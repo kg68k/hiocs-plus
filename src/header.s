@@ -30,10 +30,3 @@ dev_header::
 	.dc.b	'@IOCS   '		*デバイス名
 
 	.end
-
-* End of File ------------------------ *
-
-*	$Log:	HEADER.HA_ $
-* Revision 1.1  92/09/14  01:17:52  YuNK
-* Initial revision
-* 

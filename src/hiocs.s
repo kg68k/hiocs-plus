@@ -2173,25 +2173,3 @@ DATABUF:	.ds.b	$1000		*雑用データバッファ
 
 
 	.end	cmd_exec
-
-* End of File ------------------------- *
-
-*	$Log:	HIOCS.HA_ $
-* Revision 1.6  93/02/15  00:39:30  YuNK
-* CONFIG.SYSの program= 行での登録ができるようにした。
-* 
-* Revision 1.5  92/11/17  23:41:06  YuNK
-* 常駐時にマウスデータ送信の終了を待たないようにした
-* 
-* Revision 1.4  92/11/09  00:09:22  YuNK
-* 一部のベクタ変更処理を変更。
-* 
-* Revision 1.3  92/10/11  00:27:38  YuNK
-* 拡張フォント使用時に常駐解除すると、次の常駐時にフォントが崩れるバグを修正
-* 
-* Revision 1.2  92/09/18  13:39:10  YuNK
-* CONDRV.SYS常駐時にTimer-C割り込み処理を変更しないようにした
-* 
-* Revision 1.1  92/09/14  01:15:02  YuNK
-* Initial revision
-* 

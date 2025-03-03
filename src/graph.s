@@ -2872,10 +2872,3 @@ L002df6:				*1024×1024 xorモード
 	jmp	(a0)
 
 	.end
-
-* End of File ------------------------- *
-
-*	$Log:	GRAPH.HA_ $
-* Revision 1.1  92/09/14  01:17:30  YuNK
-* Initial revision
-* 
