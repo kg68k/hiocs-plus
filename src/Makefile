@@ -6,10 +6,7 @@ endif
 
 AS = has060
 ASFLAGS = -w2 -c3
-
-ifndef LD
-LD = hlk
-endif
+LD ?= hlk
 LDFLAGS = -x
 
 U8TOSJ = u8tosj
